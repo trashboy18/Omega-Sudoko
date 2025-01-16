@@ -3,18 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Omega_Sudoku.Exceptions;
 namespace Omega_Sudoku
 {
     internal class Conversions
     {
         public static int[,] StringToBoard(string input)
         {
-            if (input.Length != 81)
-            {
-                throw new System.ArgumentException(
-                    "Input must be exactly 81 characters long.");
-            }
+            
 
             int[,] board = new int[9, 9];
             int index = 0;
