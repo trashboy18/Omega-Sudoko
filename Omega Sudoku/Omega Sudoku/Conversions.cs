@@ -24,5 +24,24 @@ namespace Omega_Sudoku
             }
             return board;
         }
+
+        public static string BoardToString(int[,] board)
+        {
+            if (board.GetLength(0) != 9 || board.GetLength(1) != 9)
+            {
+                throw new System.ArgumentException(
+                    "Board must be a 9x9 matrix.");
+            }
+
+            StringBuilder sb = new StringBuilder(81);
+            for (int row = 0; row < 9; row++)
+            {
+                for (int col = 0; col < 9; col++)
+                {
+                    sb.Append(board[row, col]);
+                }
+            }
+            return sb.ToString();
+        }
     }
 }
