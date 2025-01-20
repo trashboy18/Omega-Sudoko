@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Omega_Sudoku
 {
@@ -10,36 +7,38 @@ namespace Omega_Sudoku
     {
         static int N = 9;
 
-        //solving the sudoku board using pure backtracking.
-        public static bool SolveSudoku(int[,] board, int row,
-                                int col)
+        /*solve sudoku using backtracking + MRV (minimum remaining values)
+        to pick the next cell*/
+        public static bool SolveSudoku(int[,] board)
         {
-            //finished backtracking.
-            if (row == N - 1 && col == N)
-                return true;
-           //go to next row.
-            if (col == N)
-            {
-                row++;
-                col = 0;
-            }
-            //check if a cell is empty.
-            if (board[row, col] != 0)
-                return SolveSudoku(board, row, col + 1);
+            //find the empty cell with the fewest valid candidates.
+            (int row, int col, List<int> candidates) = Helpers.FindCellWithMRV(board);
 
-            for (int num = 1; num <=N; num++)
+            //if no empty cell found, puzzle is solved
+            if (row == -1)
             {
-                if (Helpers.IsSafe(board, row, col, num))
+                return true;
+            }
+
+            //try each candidate in that cell.
+            foreach (int num in candidates)
+            {
+                board[row, col] = num;
+
+                if (SolveSudoku(board))
                 {
-                    board[row, col] = num;
-                    // Checking for next possibility with next col.
-                    if (SolveSudoku(board, row, col + 1))
-                        return true;
+                    return true; //done.
                 }
-                //false assumption, empty the cell.
+
+                //otherwise, backtrack.
                 board[row, col] = 0;
             }
+
+            //no candidate worked, unsolvable from this configuration.
             return false;
         }
+
+        
+        
     }
 }
