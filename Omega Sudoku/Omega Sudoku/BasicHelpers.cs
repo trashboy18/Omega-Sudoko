@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Omega_Sudoku
 {
-    internal class Helpers 
+    internal class BasicHelpers 
     {
 
         //sudoku size.
@@ -55,32 +55,7 @@ namespace Omega_Sudoku
                 }
             }
         }
-        //check if it's valid to put num into cell(row,col).
-        public static bool IsSafe(int[,] board, int row, int col,
-                           int num)
-        {
-
-            //check if we find the same num in the similar row.
-            for (int x = 0; x <= N - 1; x++)
-                if (board[row, x] == num)
-                    return false;
-
-            // check if we find the same num in the similar column. 
-            for (int x = 0; x <= N - 1; x++)
-                if (board[x, col] == num)
-                    return false;
-
-            // check if we find the same num in the particular N*N matrix.
-            int squareRib = (int)(Math.Sqrt(N));
-            int startRow = row - row % squareRib,
-                startCol = col - col % 3;
-            for (int i = 0; i < 3; i++)
-                for (int j = 0; j < squareRib; j++)
-                    if (board[i + startRow, j + startCol] == num)
-                        return false;
-
-            return true;
-        }
+        
         //calls various function to solve the sudoku.
         public static void SolveProccess( string input)
         {

@@ -10,8 +10,34 @@ namespace Omega_Sudoku
     {
         static int N = 9;
         //for each cell [row,col], store a set of valid digits (1..9).
-        public static HashSet<int>[,] Candidates = new HashSet<int>[N, N];
+        public static HashSet<int>[,] candidates = new HashSet<int>[N, N];
 
+        //initialize board cells.
+        public static void InitializeCells(int[,] board)
+        {
+            for (int row = 0; row < N; row++)
+            {
+                for (int col = 0; col < N; col++)
+                {
+                    candidates[row, col] = new HashSet<int>();
+                }
+            }
+
+            for(int row = 0; row < N; row++)
+            {
+                for(int col = 0;col < N; col++)
+                {
+                    if(board[row,col] == 0)
+                    {
+                        for(int num = 1; num <=N;num++)
+                        {
+                            if(IsSafe(board,row,col,num))
+                                candidates[row,col].Add(num);
+                        }
+                    }
+                }
+            }
+        }
         //check if it's valid to put num into cell(row,col).
         public static bool IsSafe(int[,] board, int row, int col,
                            int num)
@@ -39,12 +65,12 @@ namespace Omega_Sudoku
             return true;
         }
         //finds the cell with the least candidates.
-        public static (int, int, List<int>) FindCellWithMRV(int[,] board)
+        public static (int, int, HashSet<int>) FindCellWithMRV(int[,] board)
         {
             int bestRow = -1;
             int bestCol = -1;
             int bestCount = int.MaxValue;
-            List<int> bestCandidates = new List<int>();
+            HashSet<int> bestCandidates = new HashSet<int>();
 
             for (int r = 0; r < N; r++)
             {
@@ -52,16 +78,15 @@ namespace Omega_Sudoku
                 {
                     if (board[r, c] == 0)
                     {
-                        // cell is empty, find how many valid candidates
-                        List<int> candidates = GetCandidates(board, r, c);
-                        int count = candidates.Count;
+                        
+                        int count = candidates[r,c].Count;
 
                         if (count < bestCount)
                         {
                             bestCount = count;
                             bestRow = r;
                             bestCol = c;
-                            bestCandidates = candidates;
+                            bestCandidates = candidates[r, c];
 
                             /* Early exit if there's a cell with ZERO candidates,
                                no solution*/
@@ -73,10 +98,12 @@ namespace Omega_Sudoku
                     }
                 }
             }
+            if(bestRow == -1)
+                return (-1,-1,new HashSet<int>());
 
             /*if bestRow is still -1, that means no empty cell was found => 
              board is solved*/
-            return (bestRow, bestCol, bestCandidates);
+            return (bestRow, bestCol, new HashSet<int>(bestCandidates));
         }
 
 
