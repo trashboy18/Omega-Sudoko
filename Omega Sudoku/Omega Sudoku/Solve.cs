@@ -12,7 +12,7 @@ namespace Omega_Sudoku
         public static bool SolveSudoku(int[,] board)
         {
             //find the empty cell with the fewest valid candidates.
-            (int row, int col, List<int> candidates) = Helpers.FindCellWithMRV(board);
+            (int row, int col, List<int> candidates) = LogicHelpers.FindCellWithMRV(board);
 
             //if no empty cell found, puzzle is solved
             if (row == -1)
