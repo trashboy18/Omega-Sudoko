@@ -27,7 +27,7 @@ namespace Omega_Sudoku
                 }
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
-                Helpers.SolveProccess(input);
+                BasicHelpers.SolveProccess(input);
                 sw.Stop();
                 Console.WriteLine($"Sudoku solved in {sw.ElapsedMilliseconds} ms");
 
