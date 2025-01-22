@@ -9,8 +9,13 @@ namespace Omega_Sudoku
 {
     internal class Helpers 
     {
+
         //sudoku size.
         static int N = 9;
+        //for each cell [row,col], store a set of valid digits (1..9).
+        public static HashSet<int>[,] Candidates = new HashSet<int>[N, N];
+
+
         //print sudoku board.
         public static void PrintBoard(int[,] board)
         {
