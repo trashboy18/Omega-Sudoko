@@ -108,40 +108,57 @@ namespace Omega_Sudoku
             return (bestRow, bestCol, new HashSet<int>(bestCandidates));    
         }
 
-        public static bool ForwardCheck(int[,] board, int row, int col, int num, 
+        public static bool RemoveCandidatesFromRow(int[,] board, int row, int col, int num, 
             List<(int nr, int nc, int removed)> removedCandidates)
         {
-            for(int c = 0; c  <= N; c++)
+            for (int c = 0; c <N; c++)
             {
-                if(c != col && board[row, c] == 0)
+                if (c != col && board[row, c] == 0)
                 {
                     if (candidates[row, c].Contains(num))
                     {
                         candidates[row, c].Remove(num);
-                        removedCandidates.Add((row,c,num));
-                        if(candidates[row, c].Count == 0) { return false; }
+                        removedCandidates.Add((row, c, num));
+                        if (candidates[row, c].Count == 0) 
+                        {
+                            return false; 
+                        }
                     }
                 }
             }
+            return true;
+        }
+        public static bool RemoveCandidatesFromCol(int[,] board, int row, int col, int num,
+            List<(int nr, int nc, int removed)> removedCandidates)
+        {
 
-            for (int r = 0; r <= N; r++)
+            for (int r = 0; r < 9; r++)
             {
                 if (r != row && board[r, col] == 0)
                 {
                     if (candidates[r, col].Contains(num))
                     {
-                        candidates[row, r].Remove(num);
+                        candidates[r, col].Remove(num);
                         removedCandidates.Add((r, col, num));
-                        if (candidates[r, col].Count == 0) { return false; }
-                    }
-                }   
-            }
 
+                        if (candidates[r, col].Count == 0)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        public static bool RemoveCandidatesFromBox(int[,] board, int row, int col, int num,
+            List<(int nr, int nc, int removed)> removedCandidates)
+        {
             int boxRow = (row / MiniSquare) * MiniSquare;
             int boxCol = (col / MiniSquare) * MiniSquare;
-            for(int r = 0; r < MiniSquare; r++)
+            for (int r = 0; r < MiniSquare; r++)
             {
-                for (int c = 0; c <MiniSquare;c++)
+                for (int c = 0; c < MiniSquare; c++)
                 {
                     int nr = boxRow + r;
                     int nc = boxCol + c;
@@ -159,23 +176,29 @@ namespace Omega_Sudoku
                     }
                 }
             }
-                return true;
-
+            return true;
         }
-        //gets all valid candidates for the given empty cell.
-        public static List<int> GetCandidates(int[,] board, int row, int col)
+        public static bool ForwardCheck(int[,] board, int row, int col, int num, 
+            List<(int nr, int nc, int removed)> removedCandidates)
         {
-            List<int> candidates = new List<int>();
-
-            for (int num = 1; num <= N; num++)
+            //row.
+            if (!RemoveCandidatesFromRow(board, row, col, num, removedCandidates))
             {
-                if (IsSafe(board, row, col, num))
-                {
-                    candidates.Add(num);
-                }
+                return false;
             }
+            //col.
+            if(!RemoveCandidatesFromCol(board, row, col, num, removedCandidates))
+            {
+                return false;
+            }
+            //box.
+            if (!RemoveCandidatesFromBox(board, row, col, num, removedCandidates))
+            {
+                return false;
+            }
+            //if everything succeeded, return true.
+            return true;
 
-            return candidates;
         }
 
 
