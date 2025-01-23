@@ -200,7 +200,15 @@ namespace Omega_Sudoku
             return true;
 
         }
-
+        // Undo forward checking changes if backtracking is needed.
+        public static void UndoForwardCheck(List<(int nr, int nc, int removed)> removedCandidates)
+        {
+            foreach (var (nr, nc, removedDigit) in removedCandidates)
+            {
+                candidates[nr, nc].Add(removedDigit);
+            }
+            removedCandidates.Clear();
+        }
 
     }
 }
