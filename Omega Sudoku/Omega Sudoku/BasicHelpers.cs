@@ -65,6 +65,7 @@ namespace Omega_Sudoku
                 CheckStringValidity(input);
 
                 int[,] board = Conversions.StringToBoard(input);
+                LogicHelpers.InitializeCells(board);
                 Solve.SolveSudoku(board);
                 PrintBoard(board);
             }
@@ -73,10 +74,7 @@ namespace Omega_Sudoku
                 Console.WriteLine("An error occurred: " + e.Message);
 
             }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error: couldn't find reason.");
-            }
+            
         }
 
         
