@@ -66,7 +66,12 @@ namespace Omega_Sudoku
 
                 int[,] board = Conversions.StringToBoard(input);
                 LogicHelpers.InitializeCells(board);
-                Solve.SolveSudoku(board);
+                bool solved = Solve.SolveSudoku(board);
+                if (!solved)
+                {
+                    //sudoku not solveable. 
+                    throw new UnsolveableSudokuException("This Sudoku puzzle is unsolvable!");
+                }
                 PrintBoard(board);
             }
             catch (SudokuException e)
