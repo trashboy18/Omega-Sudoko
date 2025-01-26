@@ -215,6 +215,33 @@ namespace Omega_Sudoku
             }
             removedCandidates.Clear();
         }
+        //fill cells that only have one candidate.
+        public static bool FillNakedSingles(int[,] board)
+        {
+            bool changedSomething = false;
 
+            for (int col = 0; col < board.GetLength(0); col++)
+            {
+                for (int row = 0; row < board.GetLength(0); row++)
+                {
+                    if (board[row,col] == 0)
+                    {
+                        if(candidates[row,col].Count == 1)
+                        {
+                            int num = candidates[row, col].First();
+                            board[row, col] = num;
+                            var removed  = new List<(int  nr, int nc, int removedNum)>();
+                            if(!ForwardCheck(board,row,col,num,removed))
+                            {
+                                return false;
+                            }
+                            changedSomething = true;
+                        }
+                    }
+                }
+            }
+            return changedSomething;
+
+        }
     }
 }
