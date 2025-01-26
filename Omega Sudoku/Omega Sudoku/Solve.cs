@@ -6,7 +6,6 @@ namespace Omega_Sudoku
 {
     internal class Solve
     {
-        static int N = 9;
 
         /*solve sudoku using backtracking + MRV (minimum remaining values)
         to pick the next cell*/

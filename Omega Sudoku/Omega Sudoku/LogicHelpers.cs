@@ -9,14 +9,21 @@ namespace Omega_Sudoku
 {
     internal class LogicHelpers
     {
-        static int N = 9;
-        static int MiniSquare = (int)Math.Sqrt(N);
+        public static int N;
+        public static int MiniSquare;
         //for each cell [row,col], store a set of valid digits (1..9).
-        public static HashSet<int>[,] candidates = new HashSet<int>[N, N];
+        public static HashSet<int>[,] candidates;
 
         //initialize board cells.
         public static void InitializeCells(int[,] board)
         {
+            N = board.GetLength(0);
+            if (N != board.GetLength(1))
+            {
+                throw new ArgumentException("Board must be NxN.");
+            }
+            MiniSquare = (int)Math.Sqrt(N);
+            candidates = new HashSet<int>[N, N];
             for (int row = 0; row < N; row++)
             {
                 for (int col = 0; col < N; col++)
@@ -56,11 +63,10 @@ namespace Omega_Sudoku
                     return false;
 
             // check if we find the same num in the particular N*N matrix.
-            int squareRib = (int)(Math.Sqrt(N));
-            int startRow = row - row % squareRib,
-                startCol = col - col % 3;
-            for (int i = 0; i < 3; i++)
-                for (int j = 0; j < squareRib; j++)
+            int startRow = row - row % MiniSquare,
+                startCol = col - col % MiniSquare;
+            for (int i = 0; i < MiniSquare; i++)
+                for (int j = 0; j < MiniSquare; j++)
                     if (board[i + startRow, j + startCol] == num)
                         return false;
 
@@ -132,7 +138,7 @@ namespace Omega_Sudoku
             List<(int nr, int nc, int removed)> removedCandidates)
         {
 
-            for (int r = 0; r < 9; r++)
+            for (int r = 0; r < N; r++)
             {
                 if (r != row && board[r, col] == 0)
                 {
@@ -149,7 +155,7 @@ namespace Omega_Sudoku
                 }
             }
             return true;
-        }
+        }   
 
         public static bool RemoveCandidatesFromBox(int[,] board, int row, int col, int num,
             List<(int nr, int nc, int removed)> removedCandidates)

@@ -11,9 +11,7 @@ namespace Omega_Sudoku
     {
 
         //sudoku size.
-        static int N = 9;
         //for each cell [row,col], store a set of valid digits (1..9).
-        public static HashSet<int>[,] Candidates = new HashSet<int>[N, N];
 
 
         //print sudoku board.
@@ -25,7 +23,8 @@ namespace Omega_Sudoku
             {
                 for (int c = 0; c < N; c++)
                 {
-                    Console.Write(board[r, c] + " ");
+                    char ch = (char)('0' + board[r, c]);
+                    Console.Write(ch + " ");
                 }
                 Console.WriteLine();
             }
@@ -62,9 +61,9 @@ namespace Omega_Sudoku
                 Console.WriteLine("An error occurred: " + e.Message);
 
             }
-            catch (Exception e)
+            //catch (Exception e)
             {
-                Console.WriteLine("Couldn't find the reason for crashing.");
+              //  Console.WriteLine("Couldn't find the reason for crashing.");
             }
             
         }
