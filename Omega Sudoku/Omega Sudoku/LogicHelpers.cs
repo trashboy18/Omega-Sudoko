@@ -243,5 +243,15 @@ namespace Omega_Sudoku
             return changedSomething;
 
         }
+        //fill naked singles until there is nothing to change.
+        public static void RepeatNakedSingels(int[,] board)
+        {
+            bool changed;
+            do
+            {
+                changed = FillNakedSingles((int[,])board);
+            }
+            while (changed);
+        }
     }
 }
