@@ -42,11 +42,7 @@ namespace Omega_Sudoku
                     int val = ch - '0'; // offset from '0'
 
                     // allowed range:
-                    if (val < 0 || val > N)
-                    {
-                        throw new InvalidCharException(
-                            $"Invalid character '{ch}' => ASCII offset {val}. Must be in [0..{N}].");
-                    }
+                    BasicHelpers.CheckStringChars(val);
 
                     board[r, c] = val;
                 }
@@ -68,10 +64,7 @@ namespace Omega_Sudoku
                 for (int c = 0; c < N; c++)
                 {
                     int val = board[r, c];
-                    if (val < 0 || val > N)
-                    {
-                        throw new InvalidCharException($"Cell value {val} out of [0..{N}] range.");
-                    }
+                    BasicHelpers.CheckStringChars(val);
                     sb.Append((char)('0' + val));
                 }
             }
