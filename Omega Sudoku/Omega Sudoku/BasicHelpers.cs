@@ -48,8 +48,6 @@ namespace Omega_Sudoku
 
                 int[,] board = Conversions.StringToBoard(input);
                 LogicHelpers.InitializeCells(board);
-                //fill any 'naked singles' repeatedly before backtracking.
-                LogicHelpers.RepeatNakedSingles(board);
                 bool solved = Solve.SolveSudoku(board);
                 if (!solved)
                 {

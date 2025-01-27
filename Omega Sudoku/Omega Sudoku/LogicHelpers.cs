@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Omega_Sudoku.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,68 +11,95 @@ namespace Omega_Sudoku
     {
         public static int N;
         public static int MiniSquare;
-        //for each cell [row,col], store a set of valid digits (1..9).
+
+        //for each row, col, box, true means digit is used in row.
+        public static bool[,] rowUsed;
+        public static bool[,] colUsed;
+        public static bool[,] boxUsed;
+
+        //for forward checking with MRV
         public static HashSet<int>[,] candidates;
 
-        //initialize board cells.
+        //called once from BasicHelpers.SolveProcess, after parsing the board
         public static void InitializeCells(int[,] board)
         {
             N = board.GetLength(0);
             if (N != board.GetLength(1))
             {
-                throw new ArgumentException("Board must be NxN.");
+                throw new InvalidCellsAmountException("Board must be NxN.");
             }
             MiniSquare = (int)Math.Sqrt(N);
+
+            //initialize the usage arrays
+            rowUsed = new bool[N, N + 1]; 
+            colUsed = new bool[N, N + 1];
+            boxUsed = new bool[N, N + 1];
+
+            //create the candidate sets for each cell
             candidates = new HashSet<int>[N, N];
-            for (int row = 0; row < N; row++)
+            for (int r = 0; r < N; r++)
             {
-                for (int col = 0; col < N; col++)
+                for (int c = 0; c < N; c++)
                 {
-                    candidates[row, col] = new HashSet<int>();
+                    candidates[r, c] = new HashSet<int>();
                 }
             }
 
-            for(int row = 0; row < N; row++)
+            //fill usage arrays from the board, and build candidates for empty cells
+            for (int r = 0; r < N; r++)
             {
-                for(int col = 0;col < N; col++)
+                for (int c = 0; c < N; c++)
                 {
-                    if(board[row,col] == 0)
+                    int num = board[r, c];
+                    if (num != 0)
                     {
-                        for(int num = 1; num <=N;num++)
+                        // Mark usage
+                        rowUsed[r, num] = true;
+                        colUsed[c, num] = true;
+                        boxUsed[BoxIndex(r, c), num] = true;
+                    }
+                }
+            }
+
+            //for each empty cell, build its candidate set
+            for (int r = 0; r < N; r++)
+            {
+                for (int c = 0; c < N; c++)
+                {
+                    if (board[r, c] == 0)
+                    {
+                        // digits in [1..N]
+                        for (int d = 1; d <= N; d++)
                         {
-                            if(IsSafe(board,row,col,num))
-                                candidates[row,col].Add(num);
+                            if (IsSafe(board, r, c, d))
+                            {
+                                candidates[r, c].Add(d);
+                            }
                         }
                     }
                 }
             }
         }
-        //check if it's valid to put num into cell(row,col).
-        public static bool IsSafe(int[,] board, int row, int col,
-                           int num)
+
+        //helper to map row,col -> box index
+        private static int BoxIndex(int r, int c)
         {
+            int boxRow = r / MiniSquare;
+            int boxCol = c / MiniSquare;
+            return boxRow * MiniSquare + boxCol;
+        }
 
-            //check if we find the same num in the similar row.
-            for (int x = 0; x <= N - 1; x++)
-                if (board[row, x] == num)
-                    return false;
 
-            // check if we find the same num in the similar column. 
-            for (int x = 0; x <= N - 1; x++)
-                if (board[x, col] == num)
-                    return false;
-
-            // check if we find the same num in the particular N*N matrix.
-            int startRow = row - row % MiniSquare,
-                startCol = col - col % MiniSquare;
-            for (int i = 0; i < MiniSquare; i++)
-                for (int j = 0; j < MiniSquare; j++)
-                    if (board[i + startRow, j + startCol] == num)
-                        return false;
-
+        //check using rowUsed, colUsed, boxUsed
+        public static bool IsSafe(int[,] board, int row, int col, int num)
+        {
+            int b = BoxIndex(row, col);
+            if (rowUsed[row, num]) return false;
+            if (colUsed[col, num]) return false;
+            if (boxUsed[b, num]) return false;
             return true;
         }
-        //finds the cell with the least candidates.
+        //finds the empty cell with the fewest candidates, returns (-1,-1, empty) if solved
         public static (int, int, HashSet<int>) FindCellWithMRV(int[,] board)
         {
             int bestRow = -1;
@@ -86,9 +113,7 @@ namespace Omega_Sudoku
                 {
                     if (board[r, c] == 0)
                     {
-                        
-                        int count = candidates[r,c].Count;
-
+                        int count = candidates[r, c].Count;
                         if (count < bestCount)
                         {
                             bestCount = count;
@@ -96,171 +121,130 @@ namespace Omega_Sudoku
                             bestCol = c;
                             bestCandidates = candidates[r, c];
 
-                            /* Early exit if there's a cell with ZERO candidates,
-                               no solution*/
                             if (bestCount == 0)
                             {
+                                // means impossible config,early exit
                                 return (bestRow, bestCol, bestCandidates);
                             }
                         }
                     }
                 }
             }
-            //board solved.
-            if(bestRow == -1)
-                return (-1,-1,new HashSet<int>());
 
-            //return a COPY, to keep the original board unchanged.
-            return (bestRow, bestCol, new HashSet<int>(bestCandidates));    
+            //if bestRow == -1 => no empty => solved
+            if (bestRow == -1)
+            {
+                return (-1, -1, new HashSet<int>());
+            }
+
+            //return a copy so we don't mutate the original
+            return (bestRow, bestCol, new HashSet<int>(bestCandidates));
         }
 
-        public static bool RemoveCandidatesFromRow(int[,] board, int row, int col, int num, 
-            List<(int nr, int nc, int removed)> removedCandidates)
+        //puts digit in board[row,col], updates usage arrays
+        public static void PlaceNum(int[,] board, int row, int col, int num)
         {
-            for (int c = 0; c <N; c++)
+            board[row, col] = num;
+            rowUsed[row, num] = true;
+            colUsed[col, num] = true;
+            boxUsed[BoxIndex(row, col), num] = true;
+        }
+
+        // Removes digit from board, usage arrays
+        public static void RemoveNum(int[,] board, int row, int col, int num)
+        {
+            board[row, col] = 0;
+            rowUsed[row, num] = false;
+            colUsed[col, num] = false;
+            boxUsed[BoxIndex(row, col), num] = false;
+        }
+
+        //removes digit from empty neighbors' candidate sets, ignoring filled neighbors
+        //if removing digit from a neighbor's set, then set count hits 0,
+        //then contradiction, so return false
+        public static bool ForwardCheck(int[,] board, int row, int col, int num,
+                                        List<(int nr, int nc, int removed)> removedCandidates)
+        {
+            // row
+           if(!RemoveCandidatesFromRow(board,row,col,num,removedCandidates))
+                return false;
+            // col
+
+            if (!RemoveCandidatesFromCol(board,row, col,num,removedCandidates)) 
+                return false;
+            // box
+
+            if (!RemoveCandidatesFromBox(board, row, col, num, removedCandidates)) 
+                return false;
+
+            return true;
+        }
+        public static bool RemoveCandidatesFromRow(int[,] board, int row, int col, int num,
+            List<(int nr,int nc, int removedNum)> removedCandidates)
+        {
+            for (int cc = 0; cc < N; cc++)
             {
-                if (c != col && board[row, c] == 0)
+                if (cc != col && board[row, cc] == 0)
                 {
-                    if (candidates[row, c].Contains(num))
+                    if (candidates[row, cc].Remove(num))
                     {
-                        candidates[row, c].Remove(num);
-                        removedCandidates.Add((row, c, num));
-                        if (candidates[row, c].Count == 0) 
-                        {
-                            return false; 
-                        }
+                        removedCandidates.Add((row, cc, num));
+                        if (candidates[row, cc].Count == 0) return false;
                     }
                 }
             }
             return true;
+
         }
         public static bool RemoveCandidatesFromCol(int[,] board, int row, int col, int num,
-            List<(int nr, int nc, int removed)> removedCandidates)
+            List<(int nr, int nc, int removedNum)> removedCandidates)
         {
-
-            for (int r = 0; r < N; r++)
+            for (int rr = 0; rr < N; rr++)
             {
-                if (r != row && board[r, col] == 0)
+                if (rr != row && board[rr, col] == 0)
                 {
-                    if (candidates[r, col].Contains(num))
+                    if (candidates[rr, col].Remove(num))
                     {
-                        candidates[r, col].Remove(num);
-                        removedCandidates.Add((r, col, num));
-
-                        if (candidates[r, col].Count == 0)
-                        {
-                            return false;
-                        }
+                        removedCandidates.Add((rr, col, num));
+                        if (candidates[rr, col].Count == 0) return false;
                     }
                 }
             }
             return true;
-        }   
-
+        }
         public static bool RemoveCandidatesFromBox(int[,] board, int row, int col, int num,
-            List<(int nr, int nc, int removed)> removedCandidates)
+           List<(int nr, int nc, int removedNum)> removedCandidates)
         {
-            int boxRow = (row / MiniSquare) * MiniSquare;
-            int boxCol = (col / MiniSquare) * MiniSquare;
-            for (int r = 0; r < MiniSquare; r++)
+            int boxIndex = BoxIndex(row, col);
+            int startRow = (boxIndex / MiniSquare) * MiniSquare;
+            int startCol = (boxIndex % MiniSquare) * MiniSquare;
+            for (int rr = 0; rr < MiniSquare; rr++)
             {
-                for (int c = 0; c < MiniSquare; c++)
+                for (int cc = 0; cc < MiniSquare; cc++)
                 {
-                    int nr = boxRow + r;
-                    int nc = boxCol + c;
+                    int nr = startRow + rr;
+                    int nc = startCol + cc;
                     if ((nr != row || nc != col) && board[nr, nc] == 0)
                     {
-                        if (candidates[nr, nc].Contains(num))
+                        if (candidates[nr, nc].Remove(num))
                         {
-                            candidates[nr, nc].Remove(num);
                             removedCandidates.Add((nr, nc, num));
-                            if (candidates[nr, nc].Count == 0)
-                            {
-                                return false;
-                            }
+                            if (candidates[nr, nc].Count == 0) return false;
                         }
                     }
                 }
             }
             return true;
         }
-        public static bool ForwardCheck(int[,] board, int row, int col, int num, 
-            List<(int nr, int nc, int removed)> removedCandidates)
-        {
-            //row.
-            if (!RemoveCandidatesFromRow(board, row, col, num, removedCandidates))
-            {
-                return false;
-            }
-            //col.
-            if(!RemoveCandidatesFromCol(board, row, col, num, removedCandidates))
-            {
-                return false;
-            }
-            //box.
-            if (!RemoveCandidatesFromBox(board, row, col, num, removedCandidates))
-            {
-                return false;
-            }
-            //if everything succeeded, return true.
-            return true;
 
-        }
-        // Undo forward checking changes if backtracking is needed.
+        // undo forward-check changes
         public static void UndoForwardCheck(List<(int nr, int nc, int removed)> removedCandidates)
         {
-            foreach (var (nr, nc, removedDigit) in removedCandidates)
+            foreach (var (nr, nc, remDigit) in removedCandidates)
             {
-                candidates[nr, nc].Add(removedDigit);
+                candidates[nr, nc].Add(remDigit);
             }
             removedCandidates.Clear();
-        }
-        //fill cells that only have one candidate.
-        public static bool FillNakedSingles(int[,] board)
-        {
-            bool changedSomething = false;
-
-            for (int col = 0; col < board.GetLength(0); col++)
-            {
-                for (int row = 0; row < board.GetLength(0); row++)
-                {
-                    if (board[row,col] == 0)
-                    {
-                        if(candidates[row,col].Count == 1)
-                        {
-                            int num = candidates[row, col].First();
-                            board[row, col] = num;
-                            if (!IsSafe(board, row, col, num))
-                            {
-                                board[row, col] = 0;
-                            }
-                            else
-                            {
-                                var removed = new List<(int nr, int nc, int removedNum)>();
-                                if (!ForwardCheck(board, row, col, num, removed))
-                                {
-                                    UndoForwardCheck(removed);
-                                    board[row, col] = 0;
-                                    candidates[row, col].Remove(num);
-                                }
-                            }
-                            changedSomething = true;
-                        }
-                    }
-                }
-            }       
-            return changedSomething;
-
-        }
-        //fill naked singles until there is nothing to change.
-        public static void RepeatNakedSingles(int[,] board)
-        {
-            bool changed;
-            do
-            {
-                changed = FillNakedSingles((int[,])board);
-            }
-            while (changed);
         }
     }
 }
