@@ -45,7 +45,7 @@ namespace Omega_Sudoku
                 board[row, col] = 0;
             }
 
-            //no candidate worked, unsolvable from this configuration.
+            //no candidate worked, unsolvable from this configuration
             return false;
         }
 
