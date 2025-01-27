@@ -1,55 +1,62 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace Omega_Sudoku
 {
     internal class Solve
     {
-
-        /*solve sudoku using backtracking + MRV (minimum remaining values)
-        to pick the next cell*/
         public static bool SolveSudoku(int[,] board)
         {
-            //find the empty cell with the fewest valid candidates.
-            (int row, int col, HashSet<int> candidates) = LogicHelpers.FindCellWithMRV(board);
+            //find the empty cell with the fewest candidates
+            (int row, int col, HashSet<int> cellCandidates) = LogicHelpers.FindCellWithMRV(board);
 
-            //if no empty cell found, puzzle is solved
+            //if row=-1, puzzle solved
             if (row == -1)
             {
                 return true;
             }
 
-            //try each candidate in that cell.
-            foreach (int num in candidates)
+            //if that cell's candidates are empty, then unsolvable
+            if (cellCandidates.Count == 0)
             {
-                board[row, col] = num;
-
-                var removedCandidates = new List<(int nr, int nc, int removed)>();
-
-                if(!LogicHelpers.ForwardCheck(board, row, col,num,removedCandidates))
-                {
-                    LogicHelpers.UndoForwardCheck(removedCandidates);
-                    board[row, col] = 0;
-                    continue;
-                }
-                LogicHelpers.RepeatNakedSingles(board);
-
-                //recurse.
-                if (SolveSudoku(board))
-                {
-                    return true; //done.
-                }
-                //otherwise, backtrack.
-                LogicHelpers.UndoForwardCheck(removedCandidates);
-                board[row, col] = 0;
+                return false;
             }
 
-            //no candidate worked, unsolvable from this configuration
+            //try each candidate
+            foreach (int num in cellCandidates)
+            {
+                //check if safe with O(1).
+                if (!LogicHelpers.IsSafe(board, row, col, num))
+                {
+                    continue;
+                }
+
+                //place the number updating usage arrays
+                LogicHelpers.PlaceNum(board, row, col, num);
+
+                //forward check: remove number from neighbors' sets
+                var removed = new List<(int nr, int nc, int removed)>();
+                if (!LogicHelpers.ForwardCheck(board, row, col, num, removed))
+                {
+                    //if contradiction, revert
+                    LogicHelpers.UndoForwardCheck(removed);
+                    LogicHelpers.RemoveNum(board, row, col, num);
+                    continue;
+                }
+
+                //recurse
+                if (SolveSudoku(board))
+                {
+                    return true;
+                }
+
+                //backtrack
+                LogicHelpers.UndoForwardCheck(removed);
+                LogicHelpers.RemoveNum(board, row, col, num);
+            }
+
+            //no candidate worked, bpard is unsolvable
             return false;
         }
-
-        
-        
     }
 }
