@@ -33,6 +33,8 @@ namespace Omega_Sudoku
                     board[row, col] = 0;
                     continue;
                 }
+                LogicHelpers.RepeatNakedSingles(board);
+
                 //recurse.
                 if (SolveSudoku(board))
                 {

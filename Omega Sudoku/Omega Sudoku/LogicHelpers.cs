@@ -230,21 +230,30 @@ namespace Omega_Sudoku
                         {
                             int num = candidates[row, col].First();
                             board[row, col] = num;
-                            var removed  = new List<(int  nr, int nc, int removedNum)>();
-                            if(!ForwardCheck(board,row,col,num,removed))
+                            if (!IsSafe(board, row, col, num))
                             {
-                                return false;
+                                board[row, col] = 0;
+                            }
+                            else
+                            {
+                                var removed = new List<(int nr, int nc, int removedNum)>();
+                                if (!ForwardCheck(board, row, col, num, removed))
+                                {
+                                    UndoForwardCheck(removed);
+                                    board[row, col] = 0;
+                                    candidates[row, col].Remove(num);
+                                }
                             }
                             changedSomething = true;
                         }
                     }
                 }
-            }
+            }       
             return changedSomething;
 
         }
         //fill naked singles until there is nothing to change.
-        public static void RepeatNakedSingels(int[,] board)
+        public static void RepeatNakedSingles(int[,] board)
         {
             bool changed;
             do
