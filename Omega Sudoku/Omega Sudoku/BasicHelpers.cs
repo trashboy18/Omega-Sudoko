@@ -18,16 +18,44 @@ namespace Omega_Sudoku
         public static void PrintBoard(int[,] board)
         {
             int N = board.GetLength(0);
-            Console.WriteLine($"Sudoku solved! Here is the {N}×{N} solution:");
+            int boxSize = (int)Math.Sqrt(N); // Typically 3 for a 9x9 Sudoku
+
+            Console.WriteLine($"Sudoku solved! Here is the {N}×{N} solution:\n");
+
             for (int r = 0; r < N; r++)
             {
+                // Print horizontal separators after each box row, except after the last row
+                if (r % boxSize == 0 && r != 0)
+                {
+                    PrintHorizontalSeparator(boxSize, N);
+                }
+
                 for (int c = 0; c < N; c++)
                 {
-                    char ch = (char)('0' + board[r, c]);
+                    // Print vertical separators after each box column, except after the last column
+                    if (c % boxSize == 0 && c != 0)
+                    {
+                        Console.Write("| ");
+                    }
+
+                    // Convert the number to a character. If the cell is empty (0), print a dot.
+                    char ch = board[r, c] != 0 ? (char)('0' + board[r, c]) : '.';
                     Console.Write(ch + " ");
                 }
-                Console.WriteLine();
+                Console.WriteLine(); // Move to the next line after each row
             }
+        }
+        private static void PrintHorizontalSeparator(int boxSize, int N)
+        {
+            for (int i = 0; i < N; i++)
+            {
+                Console.Write("--");
+                if ((i + 1) % boxSize == 0 && i != N - 1)
+                {
+                    Console.Write("+");
+                }
+            }
+            Console.WriteLine();
         }
         //check if the input represents a sudoku board
         public static void CheckStringValidity(string input)
