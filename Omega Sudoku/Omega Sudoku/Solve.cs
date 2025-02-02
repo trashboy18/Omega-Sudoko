@@ -7,55 +7,70 @@ namespace Omega_Sudoku
     {
         public static bool SolveSudoku(int[,] board)
         {
-            //find the empty cell with the fewest candidates
+            //apply hidden singles repeatedly.
+            if (!LogicHelpers.RepeatHiddenSingles(board))
+            {
+                //hidden singles produced a contradiction; backtrack.
+                return false;
+            }
+
+            //find the empty cell with the fewest candidates using MRV.
             (int row, int col, HashSet<int> cellCandidates) = LogicHelpers.FindCellWithMRV(board);
 
-            //if row=-1, puzzle solved
+            //if no empty cells remain, the puzzle is solved.
             if (row == -1)
             {
                 return true;
             }
 
-            //if that cell's candidates are empty, then unsolvable
+            //if the cell has no candidates, unsolvable.
             if (cellCandidates.Count == 0)
             {
                 return false;
             }
 
-            //try each candidate
+            //for each candidate number for the chosen cell...
             foreach (int num in cellCandidates)
             {
-                //check if safe with O(1).
-                if (!LogicHelpers.IsSafe(board, row, col, num))
+                //check if placing 'num' is safe.
+                if (!LogicHelpers.IsSafe(row, col, num))
                 {
                     continue;
                 }
 
-                //place the number updating usage arrays
-                LogicHelpers.PlaceNum(board, row, col, num);
+                //clone the current state before guessing.
+                var savedState = LogicHelpers.CloneState(board);
 
-                //forward check: remove number from neighbors' sets
-                var removed = new List<(int nr, int nc, int removed)>();
+                //place the candidate number on the clone.
+                LogicHelpers.PlaceNum(board, row, col, num);
+                //BasicHelpers.PrintBoard(board);
+
+                //apply forward checking on the clone.
+                var removed = new List<(int nr, int nc, int removedNum)>();
                 if (!LogicHelpers.ForwardCheck(board, row, col, num, removed))
                 {
-                    //if contradiction, revert
+                    //contradiction: Undo changes and restore state.
                     LogicHelpers.UndoForwardCheck(removed);
                     LogicHelpers.RemoveNum(board, row, col, num);
+                    //BasicHelpers.PrintBoard(board);
+                    LogicHelpers.RestoreState(savedState, board);
                     continue;
                 }
 
-                //recurse
+                //recurse on the updated clone.
                 if (SolveSudoku(board))
                 {
                     return true;
                 }
 
-                //backtrack
+                //if the recursive call failed, backtrack: undo changes and restore state.
                 LogicHelpers.UndoForwardCheck(removed);
                 LogicHelpers.RemoveNum(board, row, col, num);
+                //BasicHelpers.PrintBoard(board);
+                LogicHelpers.RestoreState(savedState, board);
             }
 
-            //no candidate worked, bpard is unsolvable
+            //if no candidate worked, the board is unsolvable.
             return false;
         }
     }
