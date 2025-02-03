@@ -1,6 +1,7 @@
 ﻿using Omega_Sudoku.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -248,7 +249,7 @@ namespace Omega_Sudoku
             removedCandidates.Clear();
         }
 
-        public static bool FindHiddenSingles(int[,] board)
+        public static bool FindHiddenSinglesInRow(int[,] board)
         {
             bool changedSomething = false;
             for (int row = 0; row < N; row++)
@@ -290,11 +291,11 @@ namespace Omega_Sudoku
                                     //Console.ResetColor();
                                     PlaceNum(board, row, hCol,num);
                                     var removed = new List<(int nr, int nc, int removed)>();
-                                    if (!LogicHelpers.ForwardCheck(board, row, hCol, num, removed))
+                                    if (!ForwardCheck(board, row, hCol, num, removed))
                                     {
                                         //if contradiction, revert
-                                        LogicHelpers.UndoForwardCheck(removed);
-                                        LogicHelpers.RemoveNum(board, row, hCol, num);
+                                        UndoForwardCheck(removed);
+                                        RemoveNum(board, row, hCol, num);
                                         //BasicHelpers.PrintBoard(board);
                                         continue;
                                     }
@@ -311,15 +312,141 @@ namespace Omega_Sudoku
             }
             return changedSomething;
         }
+
+        public static bool FindHiddenSinglesInCol(int[,] board)
+        {
+            bool changedSomething = false;
+            for (int col = 0; col < N; col++)
+            {
+                Dictionary<int, int> keyValuePairs = new Dictionary<int, int>();
+                // Count appearances of each candidate in the column (only for empty cells)
+                for (int num = 1; num <= N; num++)
+                {
+                    if (colUsed[col, num])
+                        continue;
+                    for (int row = 0; row < N; row++)
+                    {
+                        if (board[row, col] == 0 && candidates[row, col].Contains(num))
+                        {
+                            if (!keyValuePairs.ContainsKey(num))
+                                keyValuePairs[num] = 1;
+                            else
+                                keyValuePairs[num]++;
+                        }
+                    }
+                }
+                // For each candidate that appears exactly once in this column, place it
+                foreach (int num in keyValuePairs.Keys)
+                {
+                    if (keyValuePairs[num] == 1)
+                    {
+                        for (int row = 0; row < N; row++)
+                        {
+                            if (board[row, col] == 0 && candidates[row, col].Contains(num))
+                            {
+                                if (IsSafe(row, col, num))
+                                {
+                                    PlaceNum(board, row, col, num);
+                                    var removed = new List<(int nr, int nc, int removed)>();
+                                    if (!ForwardCheck(board, row, col, num, removed))
+                                    {
+                                        UndoForwardCheck(removed);
+                                        RemoveNum(board, row, col, num);
+                                        continue;
+                                    }
+                                    changedSomething = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return changedSomething;
+        }
+
+        public static bool FindHiddenSinglesInBox(int[,] board)
+        {
+            bool changedSomething = false;
+            // There are N boxes (for a 9x9, N==9)
+            for (int box = 0; box < N; box++)
+            {
+                Dictionary<int, int> keyValuePairs = new Dictionary<int, int>();
+                int startRow = (box / MiniSquare) * MiniSquare;
+                int startCol = (box % MiniSquare) * MiniSquare;
+                // Count candidate appearances in this box
+                for (int num = 1; num <= N; num++)
+                {
+                    if (boxUsed[box, num])
+                        continue;
+                    for (int r = startRow; r < startRow + MiniSquare; r++)
+                    {
+                        for (int c = startCol; c < startCol + MiniSquare; c++)
+                        {
+                            if (board[r, c] == 0 && candidates[r, c].Contains(num))
+                            {
+                                if (!keyValuePairs.ContainsKey(num))
+                                    keyValuePairs[num] = 1;
+                                else
+                                    keyValuePairs[num]++;
+                            }
+                        }
+                    }
+                }
+                // For each candidate that appears exactly once in this box, place it
+                foreach (int num in keyValuePairs.Keys)
+                {
+                    if (keyValuePairs[num] == 1)
+                    {
+                        // Find the unique cell in this box
+                        bool placed = false;
+                        for (int r = startRow; r < startRow + MiniSquare && !placed; r++)
+                        {
+                            for (int c = startCol; c < startCol + MiniSquare && !placed; c++)
+                            {
+                                if (board[r, c] == 0 && candidates[r, c].Contains(num))
+                                {
+                                    if (IsSafe(r, c, num))
+                                    {
+                                        PlaceNum(board, r, c, num);
+                                        var removed = new List<(int nr, int nc, int removed)>();
+                                        if (!ForwardCheck(board, r, c, num, removed))
+                                        {
+                                            UndoForwardCheck(removed);
+                                            RemoveNum(board, r, c, num);
+                                            continue;
+                                        }
+                                        changedSomething = true;
+                                        placed = true; // Break out after placement
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return changedSomething;
+        }
+        public static bool FindHiddenSinglesAll(int[,] board)
+        {
+            bool changed = false;
+            bool rowChanged = FindHiddenSinglesInRow(board);
+            bool colChanged = FindHiddenSinglesInCol(board);
+            bool boxChanged = FindHiddenSinglesInBox(board);
+            changed = rowChanged || colChanged || boxChanged;
+            return changed;
+        }
+
         public static bool RepeatHiddenSingles(int[,] board)
         {
             //clone the current state before applying hidden singles.
+            //var contains the board, array usage and candidates
             var savedState = CloneState(board);
 
             bool changedSomething;
             do
             {
-                changedSomething = FindHiddenSingles(board);
+                changedSomething = FindHiddenSinglesAll(board);
             } while (changedSomething);
 
             //now check if any empty cell has no candidates (i.e. contradiction)
@@ -338,8 +465,24 @@ namespace Omega_Sudoku
             return true;
         }
 
-
-        //clone the current solver state (board, usage arrays, and candidates)
+        public static int[,] CloneBoard(int[,] board,int rows, int cols)
+        {
+            //clone board
+            int[,] boardClone = new int[rows, cols];
+            for (int i = 0; i < rows; i++)
+                for (int j = 0; j < cols; j++)
+                    boardClone[i, j] = board[i, j];
+            return boardClone;
+        }
+        public static HashSet<int>[,] CloneCandidates(int rows, int cols)
+        {
+            HashSet<int>[,] candidatesClone = new HashSet<int>[rows, cols];
+            for (int i = 0; i < rows; i++)
+                for (int j = 0; j < cols; j++)
+                    candidatesClone[i, j] = new HashSet<int>(candidates[i, j]);
+            return candidatesClone;
+        }
+        
         //clone the complete solver state (board, usage arrays, and candidate sets)
         public static (int[,] boardClone, bool[,] rowUsedClone, bool[,] colUsedClone, 
             bool[,] boxUsedClone, HashSet<int>[,] candidatesClone)
@@ -348,29 +491,24 @@ namespace Omega_Sudoku
             int rows = board.GetLength(0);
             int cols = board.GetLength(1);
 
-            //clone board
-            int[,] boardClone = new int[rows, cols];
-            for (int i = 0; i < rows; i++)
-                for (int j = 0; j < cols; j++)
-                    boardClone[i, j] = board[i, j];
-
+            int[,] boardClone = CloneBoard(board,rows,cols);
             //clone usage arrays
             bool[,] rowUsedClone = (bool[,])rowUsed.Clone();
             bool[,] colUsedClone = (bool[,])colUsed.Clone();
             bool[,] boxUsedClone = (bool[,])boxUsed.Clone();
 
             //clone candidate sets: create new HashSet for each cell
-            HashSet<int>[,] candidatesClone = new HashSet<int>[rows, cols];
-            for (int i = 0; i < rows; i++)
-                for (int j = 0; j < cols; j++)
-                    candidatesClone[i, j] = new HashSet<int>(candidates[i, j]);
+
+            HashSet<int>[,] candidatesClone = CloneCandidates(rows, cols);
+            
 
             return (boardClone, rowUsedClone, colUsedClone, boxUsedClone, candidatesClone);
         }
 
         //restore the solver state from a previously cloned state
         public static void RestoreState(
-            (int[,] boardClone, bool[,] rowUsedClone, bool[,] colUsedClone, bool[,] boxUsedClone, HashSet<int>[,] candidatesClone) state,
+            (int[,] boardClone, bool[,] rowUsedClone, bool[,] colUsedClone, 
+            bool[,] boxUsedClone, HashSet<int>[,] candidatesClone) state,
             int[,] board)
         {
             int rows = board.GetLength(0);
@@ -386,8 +524,9 @@ namespace Omega_Sudoku
             colUsed = state.colUsedClone;
             boxUsed = state.boxUsedClone;
             candidates = state.candidatesClone;
+           
         }
 
-
+        
     }
 }
