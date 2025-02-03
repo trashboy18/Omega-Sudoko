@@ -8,7 +8,7 @@ namespace Omega_Sudoku
         public static bool SolveSudoku(int[,] board)
         {
             //apply hidden singles repeatedly.
-            if (!LogicHelpers.RepeatHiddenSingles(board))
+            if (!HiddenSingles.RepeatHiddenSingles(board))
             {
                 //hidden singles produced a contradiction; backtrack.
                 return false;

@@ -46,6 +46,8 @@
     <Compile Include="Conversions.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="BasicHelpers.cs" />
+    <Compile Include="Heuristics\HiddenPairs.cs" />
+    <Compile Include="Heuristics\HiddenSingles.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="LogicHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
