@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Omega_Sudoku.Heuristics;
+using System;
 using System.Collections.Generic;
+using static Omega_Sudoku.Helpers.Enum;
 
 namespace Omega_Sudoku
 {
@@ -7,23 +9,11 @@ namespace Omega_Sudoku
     {
         public static bool SolveSudoku(int[,] board)
         {
-            //apply hidden pairs repeatedly.
-            if (!HiddenPairs.RepeatHiddenPairs(board))
+           // if (!HeuristicSolver.HeuristicSolving(board))
             {
-                //hidden pairs produced a contradiction; backtrack.
-                return false;
-            }
-
-            //apply hidden singles repeatedly.
-            if (!HiddenSingles.RepeatHiddenSingles(board))
-            {
-                //hidden singles produced a contradiction; backtrack.
-                return false;
+             //   return false;
             }
             
-
-
-
             //find the empty cell with the fewest candidates using MRV.
             (int row, int col, HashSet<int> cellCandidates) = LogicHelpers.FindCellWithMRV(board);
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Omega_Sudoku
 {
-    internal class BasicHelpers 
+    internal class BasicHelpers
     {
 
         //sudoku size.
@@ -64,14 +64,14 @@ namespace Omega_Sudoku
                 throw new InvalidCellsAmountException("board cannot be empty.");
         }
         //just ensure the input size is N squared.
-        
-        
+
+
         //calls various function to solve the sudoku.
-        public static void SolveProccess( string input)
+        public static void SolveProccess(string input)
         {
             try
             {
-                
+
                 CheckStringValidity(input);
 
                 int[,] board = Conversions.StringToBoard(input);
@@ -91,12 +91,12 @@ namespace Omega_Sudoku
             }
             //catch (Exception e)
             {
-              //  Console.WriteLine("Couldn't find the reason for crashing.");
+                //  Console.WriteLine("Couldn't find the reason for crashing.");
             }
-            
+
         }
 
-        
+
 
     }
 }
