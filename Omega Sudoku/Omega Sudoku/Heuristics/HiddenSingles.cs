@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 namespace Omega_Sudoku
 {
@@ -129,7 +130,7 @@ namespace Omega_Sudoku
                         }
                     }
                 }
-            }
+            } 
             return changedSomething;
         }
 
@@ -197,12 +198,16 @@ namespace Omega_Sudoku
         }
         public static bool FindHiddenSinglesAll(int[,] board)
         {
-            bool changed = false;
             bool rowChanged = FindHiddenSinglesInRow(board);
+            if(rowChanged)
+                return true;
             bool colChanged = FindHiddenSinglesInCol(board);
+            if(colChanged)
+                return true;
             bool boxChanged = FindHiddenSinglesInBox(board);
-            changed = rowChanged || colChanged || boxChanged;
-            return changed;
+            if(boxChanged)
+                return true;
+            return false;
         }
 
         public static bool RepeatHiddenSingles(int[,] board)

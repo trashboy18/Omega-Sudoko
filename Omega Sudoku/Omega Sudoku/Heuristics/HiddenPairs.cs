@@ -19,7 +19,6 @@ namespace Omega_Sudoku
         //for forward checking with MRV
         public static HashSet<int>[,] candidates;
 
-        // In LogicHelpers.cs
 
         /// <summary>
         /// Hidden pairs in rows.
@@ -27,60 +26,60 @@ namespace Omega_Sudoku
         /// </summary>
         public static bool FindHiddenPairsInRow(int[,] board)
         {
-            bool changed = false;
-            for (int r = 0; r < N; r++)
+            bool changedSomething = false;
+            for (int row = 0; row < N; row++)
             {
-                // Build a dictionary mapping candidate number -> list of column indices (for empty cells in row r)
-                Dictionary<int, List<int>> candidateToCols = new Dictionary<int, List<int>>();
+                Dictionary<int, int> keyValuePairs = new Dictionary<int, int>();
+
                 for (int num = 1; num <= N; num++)
                 {
-                    if (!rowUsed[r, num])
-                        candidateToCols[num] = new List<int>();
-                }
-                // Populate the dictionary
-                for (int c = 0; c < N; c++)
-                {
-                    if (board[r, c] == 0)
+
+                    if (rowUsed[row, num])
                     {
-                        foreach (int num in candidateToCols.Keys.ToList())
+                        continue;
+                    }
+                    for (int col = 0; col < N; col++)
+                    {
+                        if (candidates[row, col].Contains(num))
                         {
-                            if (candidates[r, c].Contains(num))
-                            {
-                                candidateToCols[num].Add(c);
-                            }
+                            if (!keyValuePairs.ContainsKey(num))
+                                keyValuePairs.Add(num, 1);
+                            else
+                                keyValuePairs[num] += 1;
+
+                        }
+
+                    }
+                }
+                List<int> hiddenNums = new List<int>();
+                foreach(int num in keyValuePairs.Keys)
+                {
+                    if (keyValuePairs[num] == 2)
+                    {
+                        hiddenNums.Append(num);
+                    }
+                }
+                Dictionary<int,List<int>> hiddenCells = new Dictionary<int,List<int>>();
+                for(int col = 0; col < N; col++)
+                {
+                    foreach(int num in hiddenNums)
+                    {
+                        if (candidates[row, col].Contains(num))
+                        {
+                            if (!hiddenCells.ContainsKey(col))
+                                hiddenCells[col] = new List<int>(num);
+                            else
+                                hiddenCells[col].Append(num);
                         }
                     }
                 }
-                // Check every unordered pair (a,b)
-                List<int> candidateNums = candidateToCols.Keys.ToList();
-                for (int i = 0; i < candidateNums.Count; i++)
+                foreach(int hCol in  hiddenCells.Keys)
                 {
-                    for (int j = i + 1; j < candidateNums.Count; j++)
-                    {
-                        int a = candidateNums[i], b = candidateNums[j];
-                        // Union the column indices for a and b
-                        HashSet<int> unionCols = new HashSet<int>(candidateToCols[a]);
-                        unionCols.UnionWith(candidateToCols[b]);
-                        if (unionCols.Count == 2)
-                        {
-                            // Hidden pair found: restrict each cell in these two columns to {a, b}
-                            foreach (int col in unionCols)
-                            {
-                                HashSet<int> oldSet = new HashSet<int>(candidates[r, col]);
-                                HashSet<int> newSet = new HashSet<int>(oldSet.Intersect(new int[] { a, b }));
-                                if (newSet.Count < oldSet.Count)
-                                {
-                                    candidates[r, col] = newSet;
-                                    changed = true;
-                                }
-                            }
-                        }
-                    }
+                    candidates[row, hCol] = new HashSet<int>(hiddenCells[hCol]);
                 }
             }
-            return changed;
+            return changedSomething;
         }
-
         /// <summary>
         /// Hidden pairs in columns.
         /// For each column, if two candidate numbers appear only in exactly two rows, restrict those cells to that pair.

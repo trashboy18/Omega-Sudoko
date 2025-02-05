@@ -59,8 +59,34 @@ namespace Omega_Sudoku.Heuristics
             }
             return changedSomething;
         }
-        
 
+        public static bool RepeatNakedSingles(int[,] board)
+        {
+            //clone the current state before applying hidden singles.
+            //var contains the board, array usage and candidates
+            var savedState = LogicHelpers.CloneState(board);
+
+            bool changedSomething;
+            do
+            {
+                changedSomething = FindNakedSingles(board);
+            } while (changedSomething);
+
+            //now check if any empty cell has no candidates (i.e. contradiction)
+            for (int row = 0; row < N; row++)
+            {
+                for (int col = 0; col< N; col++)
+                {
+                    if (board[row, col] == 0 && candidates[row, col].Count == 0)
+                    {
+                        //contradiction: restore the saved state and signal failure.
+                        LogicHelpers.RestoreState(savedState, board);
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
 
 
     }

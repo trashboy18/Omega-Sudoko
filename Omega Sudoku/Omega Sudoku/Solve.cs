@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Omega_Sudoku.Heuristics;
+using System;
 using System.Collections.Generic;
 
 namespace Omega_Sudoku
@@ -7,6 +8,15 @@ namespace Omega_Sudoku
     {
         public static bool SolveSudoku(int[,] board)
         {
+            if (!HiddenSingles.RepeatHiddenSingles(board))
+            {
+                //hidden singles produced a contradiction; backtrack.
+                return false;
+            }
+            if (!NakedSingles.RepeatNakedSingles(board))
+            {
+                return false;
+            }
             //apply hidden pairs repeatedly.
             if (!HiddenPairs.RepeatHiddenPairs(board))
             {
@@ -15,15 +25,8 @@ namespace Omega_Sudoku
             }
 
             //apply hidden singles repeatedly.
-            if (!HiddenSingles.RepeatHiddenSingles(board))
-            {
-                //hidden singles produced a contradiction; backtrack.
-                return false;
-            }
             
-
-
-
+            
             //find the empty cell with the fewest candidates using MRV.
             (int row, int col, HashSet<int> cellCandidates) = LogicHelpers.FindCellWithMRV(board);
 
