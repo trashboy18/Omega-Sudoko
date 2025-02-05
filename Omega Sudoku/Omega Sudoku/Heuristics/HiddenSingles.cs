@@ -3,107 +3,103 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Omega_Sudoku.Helpers.Enum;
+
 namespace Omega_Sudoku
 {
     internal class HiddenSingles
     {
+        // Assume these static variables are shared with your LogicHelpers (or are initialized there)
         public static int N;
         public static int MiniSquare;
-
-        //for each row, col, box, true means digit is used in row.
         public static bool[,] rowUsed;
         public static bool[,] colUsed;
         public static bool[,] boxUsed;
-
-        //for forward checking with MRV
         public static HashSet<int>[,] candidates;
-        public static bool FindHiddenSinglesInRow(int[,] board)
+
+        /// <summary>
+        /// Process hidden singles in each row.
+        /// For each row, if a candidate number appears exactly once (in an empty cell), 
+        /// and if it is safe, place it.
+        /// Returns Changed if at least one placement was made,
+        /// Contradiction immediately if forward checking fails,
+        /// or NoChange if nothing happened.
+        /// </summary>
+        public static Result FindHiddenSinglesInRow(int[,] board)
         {
-            bool changedSomething = false;
+            Result overallResult = Result.NoChange;
             for (int row = 0; row < N; row++)
             {
+                // Build a dictionary mapping candidate number -> count of appearances in this row.
                 Dictionary<int, int> keyValuePairs = new Dictionary<int, int>();
-
                 for (int num = 1; num <= N; num++)
                 {
-
                     if (rowUsed[row, num])
-                    {
                         continue;
-                    }
+                    keyValuePairs[num] = 0;
                     for (int col = 0; col < N; col++)
                     {
-                        if (candidates[row, col].Contains(num))
+                        if (board[row, col] == 0 && candidates[row, col].Contains(num))
                         {
-                            if (!keyValuePairs.ContainsKey(num))
-                                keyValuePairs.Add(num, 1);
-                            else
-                                keyValuePairs[num] += 1;
-
+                            keyValuePairs[num]++;
                         }
-
                     }
                 }
+                // For each candidate that appears exactly once in the row, try to place it.
                 foreach (int num in keyValuePairs.Keys)
                 {
                     if (keyValuePairs[num] == 1)
                     {
-                        for (int hCol = 0; hCol < N; hCol++)
+                        // Find the unique cell in this row that contains the candidate.
+                        for (int col = 0; col < N; col++)
                         {
-                            if (candidates[row, hCol].Contains(num) && board[row, hCol] == 0)
+                            if (board[row, col] == 0 && candidates[row, col].Contains(num))
                             {
-                                if (LogicHelpers.IsSafe(row, hCol, num))
+                                if (LogicHelpers.IsSafe(row, col, num))
                                 {
-                                    //Console.ForegroundColor = ConsoleColor.Red;
-                                    //Console.WriteLine("placing num because of hidden singles");
-                                    //Console.ResetColor();
-                                    LogicHelpers.PlaceNum(board, row, hCol, num);
+                                    LogicHelpers.PlaceNum(board, row, col, num);
                                     var removed = new List<(int nr, int nc, int removed)>();
-                                    if (!LogicHelpers.ForwardCheck(board, row, hCol, num, removed))
+                                    if (!LogicHelpers.ForwardCheck(board, row, col, num, removed))
                                     {
-                                        //if contradiction, revert
+                                        // Forward check failure: contradiction found.
                                         LogicHelpers.UndoForwardCheck(removed);
-                                        LogicHelpers.RemoveNum(board, row, hCol, num);
-                                        //BasicHelpers.PrintBoard(board);
-                                        continue;
+                                        LogicHelpers.RemoveNum(board, row, col, num);
+                                        return Result.Contradiction;
                                     }
-                                    //BasicHelpers.PrintBoard(board);
-                                    changedSomething = true;
-                                    //Console.ForegroundColor = ConsoleColor.Red;
-                                    //Console.WriteLine("finished hidden singles");
-                                    //Console.ResetColor();
+                                    overallResult = Result.Changed;
                                 }
                             }
                         }
                     }
                 }
             }
-            return changedSomething;
+            return overallResult;
         }
 
-        public static bool FindHiddenSinglesInCol(int[,] board)
+        /// <summary>
+        /// Process hidden singles in each column.
+        /// Returns Changed if at least one placement was made,
+        /// Contradiction if one is found, otherwise NoChange.
+        /// </summary>
+        public static Result FindHiddenSinglesInCol(int[,] board)
         {
-            bool changedSomething = false;
+            Result overallResult = Result.NoChange;
             for (int col = 0; col < N; col++)
             {
                 Dictionary<int, int> keyValuePairs = new Dictionary<int, int>();
-                // Count appearances of each candidate in the column (only for empty cells)
                 for (int num = 1; num <= N; num++)
                 {
                     if (colUsed[col, num])
                         continue;
+                    keyValuePairs[num] = 0;
                     for (int row = 0; row < N; row++)
                     {
                         if (board[row, col] == 0 && candidates[row, col].Contains(num))
                         {
-                            if (!keyValuePairs.ContainsKey(num))
-                                keyValuePairs[num] = 1;
-                            else
-                                keyValuePairs[num]++;
+                            keyValuePairs[num]++;
                         }
                     }
                 }
-                // For each candidate that appears exactly once in this column, place it
                 foreach (int num in keyValuePairs.Keys)
                 {
                     if (keyValuePairs[num] == 1)
@@ -120,53 +116,53 @@ namespace Omega_Sudoku
                                     {
                                         LogicHelpers.UndoForwardCheck(removed);
                                         LogicHelpers.RemoveNum(board, row, col, num);
-                                        continue;
+                                        return Result.Contradiction;
                                     }
-                                    changedSomething = true;
-                                    break;
+                                    overallResult = Result.Changed;
+                                    break;  // Only one cell per candidate in the column.
                                 }
                             }
                         }
                     }
                 }
             }
-            return changedSomething;
+            return overallResult;
         }
 
-        public static bool FindHiddenSinglesInBox(int[,] board)
+        /// <summary>
+        /// Process hidden singles in each box.
+        /// Returns Changed if at least one placement was made,
+        /// Contradiction if one is found, otherwise NoChange.
+        /// </summary>
+        public static Result FindHiddenSinglesInBox(int[,] board)
         {
-            bool changedSomething = false;
-            // There are N boxes (for a 9x9, N==9)
+            Result overallResult = Result.NoChange;
+            // There are N boxes (for a 9x9 board, N is 9)
             for (int box = 0; box < N; box++)
             {
                 Dictionary<int, int> keyValuePairs = new Dictionary<int, int>();
                 int startRow = (box / MiniSquare) * MiniSquare;
                 int startCol = (box % MiniSquare) * MiniSquare;
-                // Count candidate appearances in this box
                 for (int num = 1; num <= N; num++)
                 {
                     if (boxUsed[box, num])
                         continue;
+                    keyValuePairs[num] = 0;
                     for (int r = startRow; r < startRow + MiniSquare; r++)
                     {
                         for (int c = startCol; c < startCol + MiniSquare; c++)
                         {
                             if (board[r, c] == 0 && candidates[r, c].Contains(num))
                             {
-                                if (!keyValuePairs.ContainsKey(num))
-                                    keyValuePairs[num] = 1;
-                                else
-                                    keyValuePairs[num]++;
+                                keyValuePairs[num]++;
                             }
                         }
                     }
                 }
-                // For each candidate that appears exactly once in this box, place it
                 foreach (int num in keyValuePairs.Keys)
                 {
                     if (keyValuePairs[num] == 1)
                     {
-                        // Find the unique cell in this box
                         bool placed = false;
                         for (int r = startRow; r < startRow + MiniSquare && !placed; r++)
                         {
@@ -182,10 +178,10 @@ namespace Omega_Sudoku
                                         {
                                             LogicHelpers.UndoForwardCheck(removed);
                                             LogicHelpers.RemoveNum(board, r, c, num);
-                                            continue;
+                                            return Result.Contradiction;
                                         }
-                                        changedSomething = true;
-                                        placed = true; // Break out after placement
+                                        overallResult = Result.Changed;
+                                        placed = true;
                                     }
                                 }
                             }
@@ -193,44 +189,73 @@ namespace Omega_Sudoku
                     }
                 }
             }
-            return changedSomething;
-        }
-        public static bool FindHiddenSinglesAll(int[,] board)
-        {
-            bool changed = false;
-            bool rowChanged = FindHiddenSinglesInRow(board);
-            bool colChanged = FindHiddenSinglesInCol(board);
-            bool boxChanged = FindHiddenSinglesInBox(board);
-            changed = rowChanged || colChanged || boxChanged;
-            return changed;
+            return overallResult;
         }
 
-        public static bool RepeatHiddenSingles(int[,] board)
+        /// <summary>
+        /// Master function: applies hidden singles in rows, columns, and boxes.
+        /// Returns:
+        ///    Contradiction if any unit produces a contradiction,
+        ///    Changed if at least one placement was made,
+        ///    NoChange if nothing was placed.
+        /// </summary>
+        public static Result FindHiddenSinglesAll(int[,] board)
         {
-            //clone the current state before applying hidden singles.
-            //var contains the board, array usage and candidates
+            Result result = Result.NoChange;
+            Result rResult = FindHiddenSinglesInRow(board);
+            if (rResult == Result.Contradiction)
+                return Result.Contradiction;
+            if (rResult == Result.Changed)
+                result = Result.Changed;
+
+            Result cResult = FindHiddenSinglesInCol(board);
+            if (cResult == Result.Contradiction)
+                return Result.Contradiction;
+            if (cResult == Result.Changed)
+                result = Result.Changed;
+
+            Result bResult = FindHiddenSinglesInBox(board);
+            if (bResult == Result.Contradiction)
+                return Result.Contradiction;
+            if (bResult == Result.Changed)
+                result = Result.Changed;
+
+            return result;
+        }
+
+        /// <summary>
+        /// Repeatedly applies hidden singles until no further changes occur.
+        /// Before processing, the current state is cloned.
+        /// If a contradiction is detected, the state is restored and Contradiction is returned.
+        /// Otherwise, returns Changed if any placement was made at some point, or NoChange if none.
+        /// </summary>
+        public static Result RepeatHiddenSingles(int[,] board)
+        {
             var savedState = LogicHelpers.CloneState(board);
-
-            bool changedSomething;
+            Result result;
             do
             {
-                changedSomething = FindHiddenSinglesAll(board);
-            } while (changedSomething);
+                result = FindHiddenSinglesAll(board);
+                if (result == Result.Contradiction)
+                {
+                    LogicHelpers.RestoreState(savedState, board);
+                    return Result.Contradiction;
+                }
+            } while (result == Result.Changed);
 
-            //now check if any empty cell has no candidates (i.e. contradiction)
+            // Final contradiction check: any empty cell with zero candidates.
             for (int r = 0; r < N; r++)
             {
                 for (int c = 0; c < N; c++)
                 {
                     if (board[r, c] == 0 && candidates[r, c].Count == 0)
                     {
-                        //contradiction: restore the saved state and signal failure.
                         LogicHelpers.RestoreState(savedState, board);
-                        return false;
+                        return Result.Contradiction;
                     }
                 }
             }
-            return true;
+            return Result.NoChange;
         }
     }
 }

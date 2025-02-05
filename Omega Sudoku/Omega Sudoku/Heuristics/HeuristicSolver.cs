@@ -11,18 +11,18 @@ namespace Omega_Sudoku.Heuristics
     {
         public static bool HeuristicSolving(int[,] board)
         {
-            ////apply naked singles repeatedly.
-            //if (!NakedSingles.RepeatNakedSingles(board))
-            //{
-            //    return false;
-            //}
-            
-            ////apply hidden singles repeatedly.
-            //if (!HiddenSingles.RepeatHiddenSingles(board))
-            //{
-            //    //hidden singles produced a contradiction; backtrack.
-            //    return false;
-            //}
+            //apply naked singles repeatedly.
+            if (!NakedSingles.RepeatNakedSingles(board))
+            {
+                return false;
+            }
+
+            //apply hidden singles repeatedly.
+            if (!HiddenSingles.RepeatHiddenSingles(board))
+            {
+                //hidden singles produced a contradiction; backtrack.
+                return false;
+            }
             //apply hidden pairs repeatedly.
             HiddenPairsResult hpResult = HiddenPairs.RepeatHiddenPairs(board);
             if (hpResult == HiddenPairsResult.Contradiction)

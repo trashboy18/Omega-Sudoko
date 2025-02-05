@@ -36,7 +36,7 @@ namespace Omega_Sudoku.Heuristics
                         if (LogicHelpers.IsSafe(row, col, num))
                         {
                             //Console.ForegroundColor = ConsoleColor.Red;
-                            //Console.WriteLine("placing num because of hidden singles");
+                            //Console.WriteLine("placing num because of naked singles");
                             //Console.ResetColor();
                             LogicHelpers.PlaceNum(board, row, col, num);
                             var removed = new List<(int nr, int nc, int removed)>();
@@ -51,7 +51,7 @@ namespace Omega_Sudoku.Heuristics
                             //BasicHelpers.PrintBoard(board);
                             changedSomething = true;
                             //Console.ForegroundColor = ConsoleColor.Red;
-                            //Console.WriteLine("finished hidden singles");
+                            //Console.WriteLine("finished naked singles");
                             //Console.ResetColor();
                         }
                     }
