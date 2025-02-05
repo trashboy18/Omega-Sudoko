@@ -9,9 +9,9 @@ namespace Omega_Sudoku
     {
         public static bool SolveSudoku(int[,] board)
         {
-           // if (!HeuristicSolver.HeuristicSolving(board))
+            if (!HeuristicSolver.HeuristicSolving(board))
             {
-             //   return false;
+               return false;
             }
             
             //find the empty cell with the fewest candidates using MRV.
