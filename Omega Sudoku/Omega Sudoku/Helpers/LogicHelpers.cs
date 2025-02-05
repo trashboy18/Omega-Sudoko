@@ -251,7 +251,7 @@ namespace Omega_Sudoku
 
 
 
-        public static int[,] CloneBoard(int[,] board,int rows, int cols)
+        public static int[,] CloneBoard(int[,] board, int rows, int cols)
         {
             //clone board
             int[,] boardClone = new int[rows, cols];
@@ -268,16 +268,16 @@ namespace Omega_Sudoku
                     candidatesClone[i, j] = new HashSet<int>(candidates[i, j]);
             return candidatesClone;
         }
-        
+
         //clone the complete solver state (board, usage arrays, and candidate sets)
-        public static (int[,] boardClone, bool[,] rowUsedClone, bool[,] colUsedClone, 
+        public static (int[,] boardClone, bool[,] rowUsedClone, bool[,] colUsedClone,
             bool[,] boxUsedClone, HashSet<int>[,] candidatesClone)
             CloneState(int[,] board)
         {
             int rows = board.GetLength(0);
             int cols = board.GetLength(1);
 
-            int[,] boardClone = CloneBoard(board,rows,cols);
+            int[,] boardClone = CloneBoard(board, rows, cols);
             //clone usage arrays
             bool[,] rowUsedClone = (bool[,])rowUsed.Clone();
             bool[,] colUsedClone = (bool[,])colUsed.Clone();
@@ -286,14 +286,14 @@ namespace Omega_Sudoku
             //clone candidate sets: create new HashSet for each cell
 
             HashSet<int>[,] candidatesClone = CloneCandidates(rows, cols);
-            
+
 
             return (boardClone, rowUsedClone, colUsedClone, boxUsedClone, candidatesClone);
         }
 
         //restore the solver state from a previously cloned state
         public static void RestoreState(
-            (int[,] boardClone, bool[,] rowUsedClone, bool[,] colUsedClone, 
+            (int[,] boardClone, bool[,] rowUsedClone, bool[,] colUsedClone,
             bool[,] boxUsedClone, HashSet<int>[,] candidatesClone) state,
             int[,] board)
         {
@@ -310,9 +310,9 @@ namespace Omega_Sudoku
             colUsed = state.colUsedClone;
             boxUsed = state.boxUsedClone;
             candidates = state.candidatesClone;
-           
+
         }
 
-        
+
     }
 }
