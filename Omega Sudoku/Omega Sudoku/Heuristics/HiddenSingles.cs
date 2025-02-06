@@ -62,8 +62,7 @@ namespace Omega_Sudoku
                                     if (!LogicHelpers.ForwardCheck(board, row, col, num, removed))
                                     {
                                         // Forward check failure: contradiction found.
-                                        LogicHelpers.UndoForwardCheck(removed);
-                                        LogicHelpers.RemoveNum(board, row, col, num);
+                                        
                                         return Result.Contradiction;
                                     }
                                     overallResult = Result.Changed;
@@ -114,8 +113,7 @@ namespace Omega_Sudoku
                                     var removed = new List<(int nr, int nc, int removed)>();
                                     if (!LogicHelpers.ForwardCheck(board, row, col, num, removed))
                                     {
-                                        LogicHelpers.UndoForwardCheck(removed);
-                                        LogicHelpers.RemoveNum(board, row, col, num);
+                                        
                                         return Result.Contradiction;
                                     }
                                     overallResult = Result.Changed;
@@ -176,8 +174,7 @@ namespace Omega_Sudoku
                                         var removed = new List<(int nr, int nc, int removed)>();
                                         if (!LogicHelpers.ForwardCheck(board, r, c, num, removed))
                                         {
-                                            LogicHelpers.UndoForwardCheck(removed);
-                                            LogicHelpers.RemoveNum(board, r, c, num);
+                                            
                                             return Result.Contradiction;
                                         }
                                         overallResult = Result.Changed;

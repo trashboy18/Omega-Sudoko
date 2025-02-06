@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
+using static Omega_Sudoku.Helpers.Enum; // Bring in the Result enum
 
 namespace Omega_Sudoku.Heuristics
 {
@@ -12,82 +12,88 @@ namespace Omega_Sudoku.Heuristics
         public static int N;
         public static int MiniSquare;
 
-        //for each row, col, box, true means digit is used in row.
+        // For each row, col, box – true means a digit is already used.
         public static bool[,] rowUsed;
         public static bool[,] colUsed;
         public static bool[,] boxUsed;
 
-        //for forward checking with MRV
+        // Candidate sets for each cell (for forward checking with MRV)
         public static HashSet<int>[,] candidates;
 
-
-        public static bool FindNakedSingles(int[,] board)
+        /// <summary>
+        /// Scans the board and for each empty cell that has exactly one candidate,
+        /// places that candidate (if safe) and applies forward checking.
+        /// Returns Changed if at least one placement was made; otherwise, NoChange.
+        /// (Any contradiction is handled by not placing and simply continuing.)
+        /// </summary>
+        public static Result FindNakedSingles(int[,] board)
         {
-            bool changedSomething = false;
+            bool madeChange = false;
 
             for (int row = 0; row < N; row++)
             {
-
                 for (int col = 0; col < N; col++)
                 {
+                    // Process only empty cells.
+                    if (board[row, col] != 0)
+                        continue;
+
+                    // If the candidate set for this cell has exactly one candidate...
                     if (candidates[row, col].Count == 1)
                     {
                         int num = candidates[row, col].First();
                         if (LogicHelpers.IsSafe(row, col, num))
                         {
-                            //Console.ForegroundColor = ConsoleColor.Red;
-                            //Console.WriteLine("placing num because of naked singles");
-                            //Console.ResetColor();
                             LogicHelpers.PlaceNum(board, row, col, num);
                             var removed = new List<(int nr, int nc, int removed)>();
                             if (!LogicHelpers.ForwardCheck(board, row, col, num, removed))
                             {
-                                //if contradiction, revert
+                                // Forward check failed: undo changes.
                                 LogicHelpers.UndoForwardCheck(removed);
                                 LogicHelpers.RemoveNum(board, row, col, num);
-                                //BasicHelpers.PrintBoard(board);
                                 continue;
                             }
-                            //BasicHelpers.PrintBoard(board);
-                            changedSomething = true;
-                            //Console.ForegroundColor = ConsoleColor.Red;
-                            //Console.WriteLine("finished naked singles");
-                            //Console.ResetColor();
+                            madeChange = true;
                         }
                     }
                 }
             }
-            return changedSomething;
+
+            return madeChange ? Result.Changed : Result.NoChange;
         }
 
-        public static bool RepeatNakedSingles(int[,] board)
+        /// <summary>
+        /// Repeatedly applies naked singles until no further changes occur.
+        /// Before processing, it clones the solver state. Then, after processing,
+        /// it checks if any empty cell has zero candidates (i.e. a contradiction).
+        /// If a contradiction is detected, it restores the saved state and returns Contradiction;
+        /// otherwise, returns Changed if any changes were made (or NoChange if none).
+        /// </summary>
+        public static Result RepeatNakedSingles(int[,] board)
         {
-            //clone the current state before applying hidden singles.
-            //var contains the board, array usage and candidates
+            // Clone the current solver state (board, usage arrays, candidate sets)
             var savedState = LogicHelpers.CloneState(board);
 
-            bool changedSomething;
+            Result res;
             do
             {
-                changedSomething = FindNakedSingles(board);
-            } while (changedSomething);
-
-            //now check if any empty cell has no candidates (i.e. contradiction)
-            for (int row = 0; row < N; row++)
-            {
-                for (int col = 0; col < N; col++)
+                res = FindNakedSingles(board);
+                // If we detect a contradiction during this pass (if any empty cell has no candidates),
+                // we restore and return Contradiction.
+                for (int row = 0; row < N; row++)
                 {
-                    if (board[row, col] == 0 && candidates[row, col].Count == 0)
+                    for (int col = 0; col < N; col++)
                     {
-                        //contradiction: restore the saved state and signal failure.
-                        LogicHelpers.RestoreState(savedState, board);
-                        return false;
+                        if (board[row, col] == 0 && candidates[row, col].Count == 0)
+                        {
+                            LogicHelpers.RestoreState(savedState, board);
+                            return Result.Contradiction;
+                        }
                     }
                 }
-            }
-            return true;
+            } while (res == Result.Changed);
+
+            return Result.NoChange;
         }
-
-
     }
 }
