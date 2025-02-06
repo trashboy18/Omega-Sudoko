@@ -8,7 +8,7 @@ namespace Omega_Sudoku.Helpers
 {
     internal class Enum
     {
-        public enum HiddenPairsResult
+        public enum Result
         {
             NoChange,        // No hidden pairs were applied; state remains unchanged.
             Changed,         // Hidden pairs were applied and state updated successfully.

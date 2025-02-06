@@ -26,9 +26,9 @@ namespace Omega_Sudoku
         /// Hidden pairs in rows.
         /// For each row, if two candidate numbers appear only in exactly two columns, restrict those cells to just that pair.
         /// </summary>
-        public static HiddenPairsResult FindHiddenPairsInRow(int[,] board)
+        public static Result FindHiddenPairsInRow(int[,] board)
         {
-            HiddenPairsResult result = HiddenPairsResult.NoChange;
+            Result result = Result.NoChange;
             for (int row = 0; row < N; row++)
             {
                 // Build a dictionary mapping candidate number → count of appearances in the row.
@@ -79,14 +79,14 @@ namespace Omega_Sudoku
                     // then that is a contradiction.
                     if (hiddenCells[hCol].Count > 2)
                     {
-                        return HiddenPairsResult.Contradiction;
+                        return Result.Contradiction;
                     }
                     // If the cell currently has at least 2 candidates and hidden singles have found exactly 2 numbers,
                     // restrict its candidate set.
                     else if (hiddenCells[hCol].Count == 2 && candidates[row, hCol].Count > 2)
                     {
                         candidates[row, hCol] = new HashSet<int>(hiddenCells[hCol]);
-                        result = HiddenPairsResult.Changed;
+                        result = Result.Changed;
                     }
                 }
             }
@@ -98,9 +98,9 @@ namespace Omega_Sudoku
         /// Hidden pairs in columns.
         /// For each column, if two candidate numbers appear only in exactly two rows, restrict those cells to that pair.
         /// </summary>
-        public static HiddenPairsResult FindHiddenPairsInCol(int[,] board)
+        public static Result FindHiddenPairsInCol(int[,] board)
         {
-            HiddenPairsResult result = HiddenPairsResult.NoChange;
+            Result result = Result.NoChange;
             for (int col = 0; col < N; col++)
             {
                 Dictionary<int, int> keyValuePairs = new Dictionary<int, int>();
@@ -146,12 +146,12 @@ namespace Omega_Sudoku
                 {
                     if (hiddenCells[hRow].Count > 2)
                     {
-                        return HiddenPairsResult.Contradiction;
+                        return Result.Contradiction;
                     }
                     else if (hiddenCells[hRow].Count == 2 && candidates[hRow, col].Count > 2)
                     {
                         candidates[hRow, col] = new HashSet<int>(hiddenCells[hRow]);
-                        result = HiddenPairsResult.Changed;
+                        result = Result.Changed;
                     }
                 }
             }
@@ -163,9 +163,9 @@ namespace Omega_Sudoku
         /// Hidden pairs in boxes.
         /// For each box, if two candidate numbers appear only in exactly two cells, restrict those cells to that pair.
         /// </summary>
-        public static HiddenPairsResult FindHiddenPairsInBox(int[,] board)
+        public static Result FindHiddenPairsInBox(int[,] board)
         {
-            HiddenPairsResult result = HiddenPairsResult.NoChange;
+            Result result = Result.NoChange;
             // There are N boxes (e.g., 9 boxes for a 9x9 board)
             for (int box = 0; box < N; box++)
             {
@@ -229,7 +229,7 @@ namespace Omega_Sudoku
                 {
                     if (kvp.Value.Count > 2)
                     {
-                        return HiddenPairsResult.Contradiction;
+                        return  Result.Contradiction;
                     }
                 }
                 // Alternatively, we can scan pairs by grouping candidate numbers by the cells they appear in.
@@ -262,7 +262,7 @@ namespace Omega_Sudoku
                                 if (newSet.Count < oldSet.Count)
                                 {
                                     candidates[r, c] = newSet;
-                                    result = HiddenPairsResult.Changed;
+                                    result = Result.Changed;
                                 }
                             }
                         }
@@ -280,28 +280,28 @@ namespace Omega_Sudoku
         ///   Changed      - if any changes were made (and no contradiction),
         ///   NoChange     - if no hidden pairs were applied.
         /// </summary>
-        public static HiddenPairsResult FindHiddenPairsAll(int[,] board)
+        public static Result FindHiddenPairsAll(int[,] board)
         {
-            HiddenPairsResult rowResult = FindHiddenPairsInRow(board);
-            if (rowResult == HiddenPairsResult.Contradiction)
-                return HiddenPairsResult.Contradiction;
+            Result rowResult = FindHiddenPairsInRow(board);
+            if (rowResult == Result.Contradiction)
+                return Result.Contradiction;
 
-            HiddenPairsResult colResult = FindHiddenPairsInCol(board);
-            if (colResult == HiddenPairsResult.Contradiction)
-                return HiddenPairsResult.Contradiction;
+            Result colResult = FindHiddenPairsInCol(board);
+            if (colResult == Result.Contradiction)
+                return Result.Contradiction;
 
-            HiddenPairsResult boxResult = FindHiddenPairsInBox(board);
-            if (boxResult == HiddenPairsResult.Contradiction)
-                return HiddenPairsResult.Contradiction;
+            Result boxResult = FindHiddenPairsInBox(board);
+            if (boxResult == Result.Contradiction)
+                return Result.Contradiction;
 
             // If any of them changed the state, report Changed; otherwise, NoChange.
-            if (rowResult == HiddenPairsResult.Changed ||
-                colResult == HiddenPairsResult.Changed ||
-                boxResult == HiddenPairsResult.Changed)
+            if (rowResult == Result.Changed ||
+                colResult == Result.Changed ||
+                boxResult == Result.Changed)
             {
-                return HiddenPairsResult.Changed;
+                return Result.Changed;
             }
-            return HiddenPairsResult.NoChange;
+            return Result.NoChange;
         }
 
         /// <summary>
@@ -309,20 +309,20 @@ namespace Omega_Sudoku
         /// Before processing, clones the state; if a contradiction is detected after processing,
         /// restores the state and returns Contradiction; otherwise returns Changed if any change was made, or NoChange.
         /// </summary>
-        public static HiddenPairsResult RepeatHiddenPairs(int[,] board)
+        public static Result RepeatHiddenPairs(int[,] board)
         {
             var savedState = LogicHelpers.CloneState(board);
-            HiddenPairsResult result;
+            Result result;
             do
             {
                 result = FindHiddenPairsAll(board);
                 // If a contradiction is found at any point, restore and return.
-                if (result == HiddenPairsResult.Contradiction)
+                if (result == Result.Contradiction)
                 {
                     LogicHelpers.RestoreState(savedState, board);
-                    return HiddenPairsResult.Contradiction;
+                    return Result.Contradiction;
                 }
-            } while (result == HiddenPairsResult.Changed);
+            } while (result == Result.Changed);
 
             // After hidden pairs processing, check for contradictions in any empty cell.
             for (int r = 0; r < N; r++)
@@ -332,11 +332,11 @@ namespace Omega_Sudoku
                     if (board[r, c] == 0 && candidates[r, c].Count == 0)
                     {
                         LogicHelpers.RestoreState(savedState, board);
-                        return HiddenPairsResult.Contradiction;
+                        return Result.Contradiction;
                     }
                 }
             }
-            return HiddenPairsResult.NoChange;
+            return Result.NoChange;
         }
 
 
