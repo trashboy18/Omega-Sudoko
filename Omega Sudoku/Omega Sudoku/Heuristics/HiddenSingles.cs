@@ -30,7 +30,7 @@ namespace Omega_Sudoku
             Result overallResult = Result.NoChange;
             for (int row = 0; row < N; row++)
             {
-                // Build a dictionary mapping candidate number -> count of appearances in this row.
+                // Build a dictionary mapping candidate number:count of appearances in this row.
                 Dictionary<int, int> keyValuePairs = new Dictionary<int, int>();
                 for (int num = 1; num <= N; num++)
                 {
@@ -59,7 +59,7 @@ namespace Omega_Sudoku
                                 {
                                     LogicHelpers.PlaceNum(board, row, col, num);
                                     var removed = new List<(int nr, int nc, int removed)>();
-                                    if (!LogicHelpers.ForwardCheck(board, row, col, num, removed))
+                                    if (!LogicHelpers.ForwardCheck(board, row, col, num))
                                     {
                                         // Forward check failure: contradiction found.
                                         
@@ -67,6 +67,7 @@ namespace Omega_Sudoku
                                     }
                                     overallResult = Result.Changed;
                                 }
+                                return Result.Contradiction;
                             }
                         }
                     }
@@ -111,7 +112,7 @@ namespace Omega_Sudoku
                                 {
                                     LogicHelpers.PlaceNum(board, row, col, num);
                                     var removed = new List<(int nr, int nc, int removed)>();
-                                    if (!LogicHelpers.ForwardCheck(board, row, col, num, removed))
+                                    if (!LogicHelpers.ForwardCheck(board, row, col, num))
                                     {
                                         
                                         return Result.Contradiction;
@@ -119,6 +120,7 @@ namespace Omega_Sudoku
                                     overallResult = Result.Changed;
                                     break;  // Only one cell per candidate in the column.
                                 }
+                                return Result.Contradiction;
                             }
                         }
                     }
@@ -171,8 +173,7 @@ namespace Omega_Sudoku
                                     if (LogicHelpers.IsSafe(r, c, num))
                                     {
                                         LogicHelpers.PlaceNum(board, r, c, num);
-                                        var removed = new List<(int nr, int nc, int removed)>();
-                                        if (!LogicHelpers.ForwardCheck(board, r, c, num, removed))
+                                        if (!LogicHelpers.ForwardCheck(board, r, c, num))
                                         {
                                             
                                             return Result.Contradiction;
@@ -180,6 +181,7 @@ namespace Omega_Sudoku
                                         overallResult = Result.Changed;
                                         placed = true;
                                     }
+                                    return Result.Contradiction;
                                 }
                             }
                         }
@@ -233,24 +235,13 @@ namespace Omega_Sudoku
             do
             {
                 result = FindHiddenSinglesAll(board);
-                if (result == Result.Contradiction)
-                {
-                    LogicHelpers.RestoreState(savedState, board);
-                    return Result.Contradiction;
-                }
+                
             } while (result == Result.Changed);
 
-            // Final contradiction check: any empty cell with zero candidates.
-            for (int r = 0; r < N; r++)
+            if (result == Result.Contradiction)
             {
-                for (int c = 0; c < N; c++)
-                {
-                    if (board[r, c] == 0 && candidates[r, c].Count == 0)
-                    {
-                        LogicHelpers.RestoreState(savedState, board);
-                        return Result.Contradiction;
-                    }
-                }
+                LogicHelpers.RestoreState(savedState, board);
+                return Result.Contradiction;
             }
             return Result.NoChange;
         }

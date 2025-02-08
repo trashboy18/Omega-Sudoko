@@ -164,25 +164,22 @@ namespace Omega_Sudoku
         //removes digit from empty neighbors' candidate sets, ignoring filled neighbors
         //if removing digit from a neighbor's set, then set count hits 0,
         //then contradiction, so return false
-        public static bool ForwardCheck(int[,] board, int row, int col, int num,
-                                        List<(int nr, int nc, int removed)> removedCandidates)
+        public static bool ForwardCheck(int[,] board, int row, int col, int num)
         {
             // row
-            if (!RemoveCandidatesFromRow(board, row, col, num, removedCandidates))
+            if (!RemoveCandidatesFromRow(board, row, col, num))
                 return false;
             // col
-
-            if (!RemoveCandidatesFromCol(board, row, col, num, removedCandidates))
+            if (!RemoveCandidatesFromCol(board, row, col, num))
                 return false;
             // box
 
-            if (!RemoveCandidatesFromBox(board, row, col, num, removedCandidates))
+            if (!RemoveCandidatesFromBox(board, row, col, num))
                 return false;
 
             return true;
         }
-        public static bool RemoveCandidatesFromRow(int[,] board, int row, int col, int num,
-            List<(int nr, int nc, int removedNum)> removedCandidates)
+        public static bool RemoveCandidatesFromRow(int[,] board, int row, int col, int num)
         {
             for (int cc = 0; cc < N; cc++)
             {
@@ -190,7 +187,6 @@ namespace Omega_Sudoku
                 {
                     if (candidates[row, cc].Remove(num))
                     {
-                        removedCandidates.Add((row, cc, num));
                         if (candidates[row, cc].Count == 0) return false;
                     }
                 }
@@ -198,8 +194,7 @@ namespace Omega_Sudoku
             return true;
 
         }
-        public static bool RemoveCandidatesFromCol(int[,] board, int row, int col, int num,
-            List<(int nr, int nc, int removedNum)> removedCandidates)
+        public static bool RemoveCandidatesFromCol(int[,] board, int row, int col, int num)
         {
             for (int rr = 0; rr < N; rr++)
             {
@@ -207,15 +202,13 @@ namespace Omega_Sudoku
                 {
                     if (candidates[rr, col].Remove(num))
                     {
-                        removedCandidates.Add((rr, col, num));
                         if (candidates[rr, col].Count == 0) return false;
                     }
                 }
             }
             return true;
         }
-        public static bool RemoveCandidatesFromBox(int[,] board, int row, int col, int num,
-           List<(int nr, int nc, int removedNum)> removedCandidates)
+        public static bool RemoveCandidatesFromBox(int[,] board, int row, int col, int num)
         {
             int boxIndex = BoxIndex(row, col);
             int startRow = (boxIndex / MiniSquare) * MiniSquare;
@@ -230,7 +223,6 @@ namespace Omega_Sudoku
                     {
                         if (candidates[nr, nc].Remove(num))
                         {
-                            removedCandidates.Add((nr, nc, num));
                             if (candidates[nr, nc].Count == 0) return false;
                         }
                     }
@@ -304,7 +296,6 @@ namespace Omega_Sudoku
             for (int i = 0; i < rows; i++)
                 for (int j = 0; j < cols; j++)
                     board[i, j] = state.boardClone[i, j];
-
             //restore the static global state
             rowUsed = state.rowUsedClone;
             colUsed = state.colUsedClone;

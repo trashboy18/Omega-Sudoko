@@ -9,10 +9,10 @@ namespace Omega_Sudoku
     {
         public static bool SolveSudoku(int[,] board)
         {
-            //if (!HeuristicSolver.HeuristicSolving(board))
-            //{
-            //   return false;
-            //}
+            if (!HeuristicSolver.HeuristicSolving(board))
+            {
+               return false;
+            }
             
             //find the empty cell with the fewest candidates using MRV.
             (int row, int col, HashSet<int> cellCandidates) = LogicHelpers.FindCellWithMRV(board);
@@ -46,11 +46,8 @@ namespace Omega_Sudoku
                 //BasicHelpers.PrintBoard(board);
 
                 //apply forward checking on the clone.
-                var removed = new List<(int nr, int nc, int removedNum)>();
-                if (!LogicHelpers.ForwardCheck(board, row, col, num, removed))
-                {
-                    //contradiction: Undo changes and restore state.
-                    
+                if (!LogicHelpers.ForwardCheck(board, row, col, num))
+                {                    
                     //BasicHelpers.PrintBoard(board);
                     LogicHelpers.RestoreState(savedState, board);
                     continue;

@@ -45,16 +45,16 @@ namespace Omega_Sudoku.Heuristics
                         if (LogicHelpers.IsSafe(row, col, num))
                         {
                             LogicHelpers.PlaceNum(board, row, col, num);
-                            var removed = new List<(int nr, int nc, int removed)>();
-                            if (!LogicHelpers.ForwardCheck(board, row, col, num, removed))
+                            if (!LogicHelpers.ForwardCheck(board, row, col, num))
                             {
                                 // Forward check failed: undo changes.
-                                LogicHelpers.UndoForwardCheck(removed);
-                                LogicHelpers.RemoveNum(board, row, col, num);
-                                continue;
+                                return Result.Contradiction;
+                                
                             }
                             madeChange = true;
+                            
                         }
+                        return Result.Contradiction;
                     }
                 }
             }
@@ -78,21 +78,13 @@ namespace Omega_Sudoku.Heuristics
             do
             {
                 res = FindNakedSingles(board);
-                // If we detect a contradiction during this pass (if any empty cell has no candidates),
-                // we restore and return Contradiction.
-                for (int row = 0; row < N; row++)
-                {
-                    for (int col = 0; col < N; col++)
-                    {
-                        if (board[row, col] == 0 && candidates[row, col].Count == 0)
-                        {
-                            LogicHelpers.RestoreState(savedState, board);
-                            return Result.Contradiction;
-                        }
-                    }
-                }
+                
             } while (res == Result.Changed);
-
+            if(res == Result.Contradiction)
+            {
+                LogicHelpers.RestoreState(savedState, board);
+                return Result.Contradiction;
+            }
             return Result.NoChange;
         }
     }
