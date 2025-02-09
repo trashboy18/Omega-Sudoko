@@ -17,8 +17,8 @@ namespace Omega_Sudoku
         //print sudoku board.
         public static void PrintBoard(int[,] board)
         {
-            int N = board.GetLength(0);
-            int boxSize = (int)Math.Sqrt(N); // Typically 3 for a 9x9 Sudoku
+            int N = Globals.N;
+            int boxSize = Globals.MiniSquare; // Typically 3 for a 9x9 Sudoku
 
             Console.WriteLine($"Sudoku solved! Here is the {N}×{N} solution:\n");
 

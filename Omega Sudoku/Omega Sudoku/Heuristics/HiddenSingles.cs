@@ -12,10 +12,7 @@ namespace Omega_Sudoku
         // Assume these static variables are shared with your LogicHelpers (or are initialized there)
         public static int N;
         public static int MiniSquare;
-        public static bool[,] rowUsed;
-        public static bool[,] colUsed;
-        public static bool[,] boxUsed;
-        public static HashSet<int>[,] candidates;
+        
 
         /// <summary>
         /// Process hidden singles in each row.
@@ -34,12 +31,12 @@ namespace Omega_Sudoku
                 Dictionary<int, int> keyValuePairs = new Dictionary<int, int>();
                 for (int num = 1; num <= N; num++)
                 {
-                    if (rowUsed[row, num])
+                    if (Globals.rowUsed[row, num])
                         continue;
                     keyValuePairs[num] = 0;
                     for (int col = 0; col < N; col++)
                     {
-                        if (board[row, col] == 0 && candidates[row, col].Contains(num))
+                        if (board[row, col] == 0 && Globals.candidates[row, col].Contains(num))
                         {
                             keyValuePairs[num]++;
                         }
@@ -53,26 +50,38 @@ namespace Omega_Sudoku
                         // Find the unique cell in this row that contains the candidate.
                         for (int col = 0; col < N; col++)
                         {
-                            if (board[row, col] == 0 && candidates[row, col].Contains(num))
+                            if (board[row, col] == 0 && Globals.candidates[row, col].Contains(num))
                             {
+                                Console.WriteLine($"row trying: ({row},{col},{num})");
+                                BasicHelpers.PrintBoard(board);
+
                                 if (LogicHelpers.IsSafe(row, col, num))
                                 {
                                     LogicHelpers.PlaceNum(board, row, col, num);
-                                    var removed = new List<(int nr, int nc, int removed)>();
                                     if (!LogicHelpers.ForwardCheck(board, row, col, num))
                                     {
                                         // Forward check failure: contradiction found.
-                                        
+                                        Console.WriteLine($"row forwardChecking: ({row},{col},{num})");
+
                                         return Result.Contradiction;
                                     }
+                                    BasicHelpers.PrintBoard(board);
+
                                     overallResult = Result.Changed;
+
+                                    break;
                                 }
-                                return Result.Contradiction;
+                                else
+                                {
+                                    Console.WriteLine($"row isn't safe: ({row},{col},{num})");
+                                    return Result.Contradiction;
+                                }
                             }
                         }
                     }
                 }
             }
+
             return overallResult;
         }
 
@@ -84,17 +93,18 @@ namespace Omega_Sudoku
         public static Result FindHiddenSinglesInCol(int[,] board)
         {
             Result overallResult = Result.NoChange;
+
             for (int col = 0; col < N; col++)
             {
                 Dictionary<int, int> keyValuePairs = new Dictionary<int, int>();
                 for (int num = 1; num <= N; num++)
                 {
-                    if (colUsed[col, num])
+                    if (Globals.colUsed[col, num])
                         continue;
                     keyValuePairs[num] = 0;
                     for (int row = 0; row < N; row++)
                     {
-                        if (board[row, col] == 0 && candidates[row, col].Contains(num))
+                        if (board[row, col] == 0 && Globals.candidates[row, col].Contains(num))
                         {
                             keyValuePairs[num]++;
                         }
@@ -106,26 +116,38 @@ namespace Omega_Sudoku
                     {
                         for (int row = 0; row < N; row++)
                         {
-                            if (board[row, col] == 0 && candidates[row, col].Contains(num))
+                            if (board[row, col] == 0 && Globals.candidates[row, col].Contains(num))
                             {
+                                Console.WriteLine($"col trying: ({row},{col},{num})");
+                                BasicHelpers.PrintBoard(board);
+
                                 if (LogicHelpers.IsSafe(row, col, num))
                                 {
                                     LogicHelpers.PlaceNum(board, row, col, num);
                                     var removed = new List<(int nr, int nc, int removed)>();
                                     if (!LogicHelpers.ForwardCheck(board, row, col, num))
                                     {
-                                        
+                                        Console.WriteLine($"col failed forward checking: ({row},{col},{num})");
+
                                         return Result.Contradiction;
                                     }
+                                    BasicHelpers.PrintBoard(board);
+
                                     overallResult = Result.Changed;
+
                                     break;  // Only one cell per candidate in the column.
                                 }
-                                return Result.Contradiction;
+                                else
+                                {
+                                    Console.WriteLine($"col isnt safe: ({row},{col},{num})");
+                                    return Result.Contradiction;
+                                }
                             }
                         }
                     }
                 }
             }
+
             return overallResult;
         }
 
@@ -137,6 +159,7 @@ namespace Omega_Sudoku
         public static Result FindHiddenSinglesInBox(int[,] board)
         {
             Result overallResult = Result.NoChange;
+
             // There are N boxes (for a 9x9 board, N is 9)
             for (int box = 0; box < N; box++)
             {
@@ -145,14 +168,14 @@ namespace Omega_Sudoku
                 int startCol = (box % MiniSquare) * MiniSquare;
                 for (int num = 1; num <= N; num++)
                 {
-                    if (boxUsed[box, num])
+                    if (Globals.boxUsed[box, num])
                         continue;
                     keyValuePairs[num] = 0;
                     for (int r = startRow; r < startRow + MiniSquare; r++)
                     {
                         for (int c = startCol; c < startCol + MiniSquare; c++)
                         {
-                            if (board[r, c] == 0 && candidates[r, c].Contains(num))
+                            if (board[r, c] == 0 && Globals.candidates[r, c].Contains(num))
                             {
                                 keyValuePairs[num]++;
                             }
@@ -168,20 +191,30 @@ namespace Omega_Sudoku
                         {
                             for (int c = startCol; c < startCol + MiniSquare && !placed; c++)
                             {
-                                if (board[r, c] == 0 && candidates[r, c].Contains(num))
+                                if (board[r, c] == 0 && Globals.candidates[r, c].Contains(num))
                                 {
+                                    Console.WriteLine($"Box trying: ({r},{c},{num})");
+                                    BasicHelpers.PrintBoard(board);
+
                                     if (LogicHelpers.IsSafe(r, c, num))
                                     {
                                         LogicHelpers.PlaceNum(board, r, c, num);
                                         if (!LogicHelpers.ForwardCheck(board, r, c, num))
                                         {
-                                            
+                                            Console.WriteLine($"box isn't forwardChecking:({r},{c},{num})");
+
                                             return Result.Contradiction;
                                         }
                                         overallResult = Result.Changed;
+                                        BasicHelpers.PrintBoard(board);
+
                                         placed = true;
                                     }
-                                    return Result.Contradiction;
+                                    else
+                                    {
+                                        Console.WriteLine($"box isn't safe:({r},{c},{num})");
+                                        return Result.Contradiction;
+                                    }
                                 }
                             }
                         }
@@ -200,37 +233,29 @@ namespace Omega_Sudoku
         /// </summary>
         public static Result FindHiddenSinglesAll(int[,] board)
         {
-            Result result = Result.NoChange;
             Result rResult = FindHiddenSinglesInRow(board);
             if (rResult == Result.Contradiction)
                 return Result.Contradiction;
-            if (rResult == Result.Changed)
-                result = Result.Changed;
 
             Result cResult = FindHiddenSinglesInCol(board);
             if (cResult == Result.Contradiction)
                 return Result.Contradiction;
-            if (cResult == Result.Changed)
-                result = Result.Changed;
-
             Result bResult = FindHiddenSinglesInBox(board);
             if (bResult == Result.Contradiction)
                 return Result.Contradiction;
-            if (bResult == Result.Changed)
-                result = Result.Changed;
-
-            return result;
+            if (rResult == Result.Changed || cResult == Result.Changed || bResult == Result.Changed)
+                return Result.Changed;
+            return Result.NoChange;
         }
 
         /// <summary>
-        /// Repeatedly applies hidden singles until no further changes occur.
-        /// Before processing, the current state is cloned.
-        /// If a contradiction is detected, the state is restored and Contradiction is returned.
-        /// Otherwise, returns Changed if any placement was made at some point, or NoChange if none.
+        /// 
         /// </summary>
         public static Result RepeatHiddenSingles(int[,] board)
         {
-            var savedState = LogicHelpers.CloneState(board);
+            N = Globals.N;
+            MiniSquare = Globals.MiniSquare;
+            //var savedState = LogicHelpers.CloneState(board);
             Result result;
             do
             {
@@ -240,9 +265,10 @@ namespace Omega_Sudoku
 
             if (result == Result.Contradiction)
             {
-                LogicHelpers.RestoreState(savedState, board);
+               // LogicHelpers.RestoreState(savedState, board);
                 return Result.Contradiction;
             }
+            
             return Result.NoChange;
         }
     }
