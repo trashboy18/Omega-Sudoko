@@ -11,15 +11,6 @@ namespace Omega_Sudoku.Heuristics
     {
         public static int N;
         public static int MiniSquare;
-
-        // For each row, col, box – true means a digit is already used.
-        public static bool[,] rowUsed;
-        public static bool[,] colUsed;
-        public static bool[,] boxUsed;
-
-        // Candidate sets for each cell (for forward checking with MRV)
-        public static HashSet<int>[,] candidates;
-
         /// <summary>
         /// Scans the board and for each empty cell that has exactly one candidate,
         /// places that candidate (if safe) and applies forward checking.
@@ -36,11 +27,10 @@ namespace Omega_Sudoku.Heuristics
                     // Process only empty cells.
                     if (board[row, col] != 0)
                         continue;
-                    Console.WriteLine(candidates[row,col].First());
                     // If the candidate set for this cell has exactly one candidate...
-                    if (candidates[row, col].Count == 1)
+                    if (Globals.candidates[row, col].Count == 1)
                     {
-                        int num = candidates[row, col].First();
+                        int num = Globals.candidates[row, col].First();
                         if (LogicHelpers.IsSafe(row, col, num))
                         {
                             LogicHelpers.PlaceNum(board, row, col, num);
@@ -71,8 +61,6 @@ namespace Omega_Sudoku.Heuristics
         /// </summary>
         public static Result RepeatNakedSingles(int[,] board)
         {
-            // Clone the current solver state (board, usage arrays, candidate sets)
-            //var savedState = LogicHelpers.CloneState(board);
             N = Globals.N;
             Result res;
             do
@@ -82,7 +70,6 @@ namespace Omega_Sudoku.Heuristics
             } while (res == Result.Changed);
             if(res == Result.Contradiction)
             {
-               // LogicHelpers.RestoreState(savedState, board);
                 return Result.Contradiction;
             }
             

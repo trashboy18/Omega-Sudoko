@@ -13,16 +13,6 @@ namespace Omega_Sudoku
         public static int N;
         public static int MiniSquare;
 
-        //for each row, col, box, true means digit is used in row.
-        public static bool[,] rowUsed;
-        public static bool[,] colUsed;
-        public static bool[,] boxUsed;
-
-        //for forward checking with MRV
-        public static HashSet<int>[,] candidates;
-
-        // In LogicHelpers.cs
-
         /// <summary>
         /// Hidden pairs in rows.
         /// For each row, if two candidate numbers appear only in exactly two columns, restrict those cells to just that pair.
@@ -38,12 +28,12 @@ namespace Omega_Sudoku
                 Dictionary<int, List<int>> keyValuePairs = new Dictionary<int, List<int>>();
                 for (int num = 1; num <= N; num++)
                 {
-                    if (rowUsed[row, num])
+                    if (Globals.rowUsed[row, num])
                         continue;
                     
                     for (int col = 0; col < N; col++)
                     {
-                        if (board[row, col] == 0 && candidates[row, col].Contains(num))
+                        if (board[row, col] == 0 && Globals.candidates[row, col].Contains(num))
                         {
                             if (!keyValuePairs.ContainsKey(num))
                                 keyValuePairs[num] = new List<int> { col };
@@ -70,7 +60,7 @@ namespace Omega_Sudoku
                         }
                         if(values.Count == 2)
                         {
-                            candidates[row,hCol1] = new HashSet<int>(values);
+                            Globals.candidates[row,hCol1] = new HashSet<int>(values);
                             result = Result.Changed;
                         }
                         if(values.Count > 2)
@@ -98,12 +88,12 @@ namespace Omega_Sudoku
                 Dictionary<int, List<int>> keyValuePairs = new Dictionary<int, List<int>>();
                 for (int num = 1; num <= N; num++)
                 {
-                    if (rowUsed[col, num])
+                    if (Globals.rowUsed[col, num])
                         continue;
 
                     for (int row = 0; row < N; row++)
                     {
-                        if (board[row, col] == 0 && candidates[row, col].Contains(num))
+                        if (board[row, col] == 0 && Globals.candidates[row, col].Contains(num))
                         {
                             if (!keyValuePairs.ContainsKey(num))
                                 keyValuePairs[num] = new List<int> { row };
@@ -130,7 +120,7 @@ namespace Omega_Sudoku
                         }
                         if (values.Count == 2)
                         {
-                            candidates[col, hRow1] = new HashSet<int>(values);
+                            Globals.candidates[col, hRow1] = new HashSet<int>(values);
                             result = Result.Changed;
                         }
                         if (values.Count > 2)
@@ -165,7 +155,7 @@ namespace Omega_Sudoku
                 Dictionary<int, List<(int, int)>> keyValuePairs = new Dictionary<int, List<(int, int)>>();
                 for (int num = 1; num <= N; num++)
                 {
-                    if (boxUsed[box, num])
+                    if (Globals.boxUsed[box, num])
                         continue;
 
                     // Initialize an empty list for candidate num.
@@ -176,7 +166,7 @@ namespace Omega_Sudoku
                     {
                         for (int c = startCol; c < startCol + MiniSquare; c++)
                         {
-                            if (board[r, c] == 0 && candidates[r, c].Contains(num))
+                            if (board[r, c] == 0 && Globals.candidates[r, c].Contains(num))
                             {
                                 keyValuePairs[num].Add((r, c));
                             }
@@ -211,12 +201,10 @@ namespace Omega_Sudoku
                             {
                                 int r = pos.Item1;
                                 int c = pos.Item2;
-                                candidates[r, c] = new HashSet<int>(unionCandidates);
+                                Globals.candidates[r, c] = new HashSet<int>(unionCandidates);
                                 result = Result.Changed;
-                                Console.WriteLine("hi");
                             }
                         }
-                        Console.WriteLine("hello");
                         // If more than 2 candidates appear exactly in these two cells, that is a contradiction.
                         if (unionCandidates.Count > 2)
                         {
@@ -272,28 +260,24 @@ namespace Omega_Sudoku
             N = Globals.N;
             MiniSquare = Globals.MiniSquare;
              
-            var savedState = LogicHelpers.CloneState(board);
             Result result;
             do
             {
                 result = FindHiddenPairsAll(board);
-                // If a contradiction is found at any point, restore and return.
-                if (result == Result.Contradiction)
-                {
-                    //LogicHelpers.RestoreState(savedState, board);
-                    return Result.Contradiction;
-                }
+                
             } while (result == Result.Changed);
-            if(result == Result.Contradiction)
-
+            // If a contradiction is found at any point, restore and return.
+            if (result == Result.Contradiction)
+            {
+                return Result.Contradiction;
+            }
             // After hidden pairs processing, check for contradictions in any empty cell.
             for (int r = 0; r < N; r++)
             {
                 for (int c = 0; c < N; c++)
                 {
-                    if (board[r, c] == 0 && candidates[r, c].Count == 0)
+                    if (board[r, c] == 0 && Globals.candidates[r, c].Count == 0)
                     {
-                        LogicHelpers.RestoreState(savedState, board);
                         return Result.Contradiction;
                     }
                 }
