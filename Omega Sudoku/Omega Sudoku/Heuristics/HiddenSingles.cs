@@ -52,8 +52,6 @@ namespace Omega_Sudoku
                         {
                             if (board[row, col] == 0 && Globals.candidates[row, col].Contains(num))
                             {
-                                Console.WriteLine($"row trying: ({row},{col},{num})");
-                                BasicHelpers.PrintBoard(board);
 
                                 if (LogicHelpers.IsSafe(row, col, num))
                                 {
@@ -61,11 +59,9 @@ namespace Omega_Sudoku
                                     if (!LogicHelpers.ForwardCheck(board, row, col, num))
                                     {
                                         // Forward check failure: contradiction found.
-                                        Console.WriteLine($"row forwardChecking: ({row},{col},{num})");
 
                                         return Result.Contradiction;
                                     }
-                                    BasicHelpers.PrintBoard(board);
 
                                     overallResult = Result.Changed;
 
@@ -73,7 +69,6 @@ namespace Omega_Sudoku
                                 }
                                 else
                                 {
-                                    Console.WriteLine($"row isn't safe: ({row},{col},{num})");
                                     return Result.Contradiction;
                                 }
                             }
@@ -118,8 +113,6 @@ namespace Omega_Sudoku
                         {
                             if (board[row, col] == 0 && Globals.candidates[row, col].Contains(num))
                             {
-                                Console.WriteLine($"col trying: ({row},{col},{num})");
-                                BasicHelpers.PrintBoard(board);
 
                                 if (LogicHelpers.IsSafe(row, col, num))
                                 {
@@ -127,11 +120,10 @@ namespace Omega_Sudoku
                                     var removed = new List<(int nr, int nc, int removed)>();
                                     if (!LogicHelpers.ForwardCheck(board, row, col, num))
                                     {
-                                        Console.WriteLine($"col failed forward checking: ({row},{col},{num})");
 
                                         return Result.Contradiction;
                                     }
-                                    BasicHelpers.PrintBoard(board);
+
 
                                     overallResult = Result.Changed;
 
@@ -139,7 +131,6 @@ namespace Omega_Sudoku
                                 }
                                 else
                                 {
-                                    Console.WriteLine($"col isnt safe: ({row},{col},{num})");
                                     return Result.Contradiction;
                                 }
                             }
@@ -193,26 +184,21 @@ namespace Omega_Sudoku
                             {
                                 if (board[r, c] == 0 && Globals.candidates[r, c].Contains(num))
                                 {
-                                    Console.WriteLine($"Box trying: ({r},{c},{num})");
-                                    BasicHelpers.PrintBoard(board);
 
                                     if (LogicHelpers.IsSafe(r, c, num))
                                     {
                                         LogicHelpers.PlaceNum(board, r, c, num);
                                         if (!LogicHelpers.ForwardCheck(board, r, c, num))
                                         {
-                                            Console.WriteLine($"box isn't forwardChecking:({r},{c},{num})");
 
                                             return Result.Contradiction;
                                         }
                                         overallResult = Result.Changed;
-                                        BasicHelpers.PrintBoard(board);
 
                                         placed = true;
                                     }
                                     else
                                     {
-                                        Console.WriteLine($"box isn't safe:({r},{c},{num})");
                                         return Result.Contradiction;
                                     }
                                 }

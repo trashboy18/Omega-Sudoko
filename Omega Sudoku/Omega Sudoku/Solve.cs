@@ -9,13 +9,13 @@ namespace Omega_Sudoku
     {
         public static bool SolveSudoku(int[,] board)
         {
-            var savedState = LogicHelpers.CloneState(board);
+            //Console.WriteLine("starting hidden singles");
             if (!HeuristicSolver.HeuristicSolving(board))
             {
-                Console.WriteLine("not good");
+              //  Console.WriteLine("oh no! hidden singles didn't work!");
                return false;
             }
-            Console.WriteLine("i was here");
+            //Console.WriteLine("finished hidden singles");
             //find the empty cell with the fewest candidates using MRV.
             (int row, int col, HashSet<int> cellCandidates) = LogicHelpers.FindCellWithMRV(board);
 
@@ -34,6 +34,7 @@ namespace Omega_Sudoku
             //for each candidate number for the chosen cell...
             foreach (int num in cellCandidates)
             {
+               // Console.WriteLine($"guessing number: ({row},{col},{num})");
                 //check if placing 'num' is safe.
                 if (!LogicHelpers.IsSafe(row, col, num))
                 {
@@ -41,7 +42,7 @@ namespace Omega_Sudoku
                 }
 
                 //clone the current state before guessing.
-                 savedState = LogicHelpers.CloneState(board);
+                 var savedState = LogicHelpers.CloneState(board);
 
                 //place the candidate number on the clone.
                 LogicHelpers.PlaceNum(board, row, col, num);
@@ -62,8 +63,9 @@ namespace Omega_Sudoku
                 }
 
                 //if the recursive call failed, backtrack: undo changes and restore state.
-                
+
                 //BasicHelpers.PrintBoard(board);
+
                 LogicHelpers.RestoreState(savedState, board);
             }
 
