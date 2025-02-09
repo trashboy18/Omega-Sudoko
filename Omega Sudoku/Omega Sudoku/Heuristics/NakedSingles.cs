@@ -29,7 +29,6 @@ namespace Omega_Sudoku.Heuristics
         public static Result FindNakedSingles(int[,] board)
         {
             bool madeChange = false;
-
             for (int row = 0; row < N; row++)
             {
                 for (int col = 0; col < N; col++)
@@ -37,7 +36,7 @@ namespace Omega_Sudoku.Heuristics
                     // Process only empty cells.
                     if (board[row, col] != 0)
                         continue;
-
+                    Console.WriteLine(candidates[row,col].First());
                     // If the candidate set for this cell has exactly one candidate...
                     if (candidates[row, col].Count == 1)
                     {
@@ -54,7 +53,8 @@ namespace Omega_Sudoku.Heuristics
                             madeChange = true;
                             
                         }
-                        return Result.Contradiction;
+                        else
+                            return Result.Contradiction;
                     }
                 }
             }
@@ -72,8 +72,8 @@ namespace Omega_Sudoku.Heuristics
         public static Result RepeatNakedSingles(int[,] board)
         {
             // Clone the current solver state (board, usage arrays, candidate sets)
-            var savedState = LogicHelpers.CloneState(board);
-
+            //var savedState = LogicHelpers.CloneState(board);
+            N = Globals.N;
             Result res;
             do
             {
@@ -82,9 +82,10 @@ namespace Omega_Sudoku.Heuristics
             } while (res == Result.Changed);
             if(res == Result.Contradiction)
             {
-                LogicHelpers.RestoreState(savedState, board);
+               // LogicHelpers.RestoreState(savedState, board);
                 return Result.Contradiction;
             }
+            
             return Result.NoChange;
         }
     }

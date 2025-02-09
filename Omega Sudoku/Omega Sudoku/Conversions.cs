@@ -8,19 +8,22 @@ namespace Omega_Sudoku
 {
     internal class Conversions
     {
-        static int N = 9;
+        static int N;
+        static int MiniSquare;
         private static int DeduceBoardSize(int length)
         {
             //check if length is a perfect square: length = N*N.
-            int N = (int)Math.Round(Math.Sqrt(length));
+            Globals.N = (int)Math.Round(Math.Sqrt(length));
+            N = Globals.N;
             if (N * N != length)
             {
                 throw new InvalidCellsAmountException($"Puzzle length {length} isn't N*N for an integer N (e.g. 9x9 => 81).");
             }
 
             //check if N itself is a perfect square.
-            int boxSize = (int)Math.Round(Math.Sqrt(N));
-            if (boxSize * boxSize != N)
+            Globals.MiniSquare = (int)Math.Round(Math.Sqrt(N));
+            MiniSquare = Globals.MiniSquare;
+            if (MiniSquare * MiniSquare != N)
             {
                 throw new InvalidCellsAmountException($"N={N} isn't a perfect square. Standard Sudoku requires sqrt(N) to be integer.");
             }
@@ -56,7 +59,7 @@ namespace Omega_Sudoku
 
         public static string BoardToString(int[,] board)
         {
-            int N = board.GetLength(0);
+            int N = Globals.N;
             if (N != board.GetLength(1))
             {
                 throw new InvalidCellsAmountException($"Board must be NxN. Found {N}x{board.GetLength(1)}.");

@@ -11,14 +11,16 @@ namespace Omega_Sudoku.Heuristics
     {
         public static bool HeuristicSolving(int[,] board)
         {
+            //apply hidden singles repeatedly.
+            
             //apply naked singles repeatedly.
             //Result nsResult = NakedSingles.RepeatNakedSingles(board);
             //if (nsResult == Result.Contradiction)
             //{
+
             //    return false;
             //}
 
-            //apply hidden singles repeatedly.
             Result hsResult = HiddenSingles.RepeatHiddenSingles(board);
 
             if (hsResult == Result.Contradiction)
@@ -27,12 +29,12 @@ namespace Omega_Sudoku.Heuristics
                 return false;
             }
             //apply hidden pairs repeatedly.
-            //Result hpResult = HiddenPairs.RepeatHiddenPairs(board);
+            // Result hpResult = HiddenPairs.RepeatHiddenPairs(board);
             //if (hpResult == Result.Contradiction)
-            //{
-            //    // Hidden pairs processing detected a contradiction; backtrack.
-            //    return false;
-            //}
+            {
+                // Hidden pairs processing detected a contradiction; backtrack.
+              //  return false;
+            }
 
 
             return true;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using static Omega_Sudoku.Helpers.Enum;
@@ -28,67 +29,57 @@ namespace Omega_Sudoku
         /// </summary>
         public static Result FindHiddenPairsInRow(int[,] board)
         {
+            
             Result result = Result.NoChange;
+            Console.WriteLine(N);
             for (int row = 0; row < N; row++)
             {
-                // Build a dictionary mapping candidate number → count of appearances in the row.
-                Dictionary<int, int> keyValuePairs = new Dictionary<int, int>();
+                // Build a dictionary mapping candidate num → indexes of appearances in the row.
+                Dictionary<int, List<int>> keyValuePairs = new Dictionary<int, List<int>>();
                 for (int num = 1; num <= N; num++)
                 {
                     if (rowUsed[row, num])
                         continue;
-                    keyValuePairs[num] = 0;
+                    
                     for (int col = 0; col < N; col++)
                     {
                         if (board[row, col] == 0 && candidates[row, col].Contains(num))
                         {
-                            keyValuePairs[num]++;
-                        }
-                    }
-                }
-                // Build a list of numbers that appear exactly twice in this row.
-                List<int> hiddenNums = new List<int>();
-                foreach (int num in keyValuePairs.Keys)
-                {
-                    if (keyValuePairs[num] == 2)
-                    {
-                        hiddenNums.Add(num);
-                    }
-                }
-                // Build a dictionary mapping a cell (by column index) to a list of candidate numbers (from hiddenNums) that appear in that cell.
-                Dictionary<int, List<int>> hiddenCells = new Dictionary<int, List<int>>();
-                for (int col = 0; col < N; col++)
-                {
-                    if (board[row, col] != 0)
-                        continue;
-                    foreach (int num in hiddenNums)
-                    {
-                        if (candidates[row, col].Contains(num))
-                        {
-                            if (!hiddenCells.ContainsKey(col))
-                                hiddenCells[col] = new List<int> { num };
+                            if (!keyValuePairs.ContainsKey(num))
+                                keyValuePairs[num] = new List<int> { col };
                             else
-                                hiddenCells[col].Add(num);
+                                keyValuePairs[num].Add(col);
                         }
                     }
                 }
-                // Now check each cell in the row.
-                foreach (int hCol in hiddenCells.Keys)
+                foreach(int hNum1 in keyValuePairs.Keys)
                 {
-                    // If more than 2 candidate numbers appear exactly twice in this row for that cell,
-                    // then that is a contradiction.
-                    if (hiddenCells[hCol].Count > 2)
+                    if (keyValuePairs[hNum1].Count == 2)
                     {
-                        return Result.Contradiction;
-                    }
-                    // If the cell currently has at least 2 candidates and hidden singles have found exactly 2 numbers,
-                    // restrict its candidate set.
-                    else if (hiddenCells[hCol].Count == 2 && candidates[row, hCol].Count > 2)
-                    {
-                        candidates[row, hCol] = new HashSet<int>(hiddenCells[hCol]);
-                        result = Result.Changed;
+                        int hCol1 = keyValuePairs[hNum1].First();
+                        int hCol2 = keyValuePairs[hNum1].Last();
+                        HashSet<int> values = new HashSet<int>();
+                        foreach (int hNum2 in keyValuePairs.Keys)
+                        {
+                            if(keyValuePairs[hNum2].Count == 2 && 
+                                keyValuePairs[hNum2].Contains(hCol1) && 
+                                keyValuePairs[hNum2].Contains(hCol2))
+                            {
+                                values.Add(hNum2);
+                            }
+                        }
+                        if(values.Count == 2)
+                        {
+                            candidates[row,hCol1] = new HashSet<int>(values);
+                            result = Result.Changed;
+                        }
+                        if(values.Count > 2)
+                        {
+                            return Result.Contradiction;
+                        }
                     }
                 }
+               
             }
             return result;
         }
@@ -103,57 +94,52 @@ namespace Omega_Sudoku
             Result result = Result.NoChange;
             for (int col = 0; col < N; col++)
             {
-                Dictionary<int, int> keyValuePairs = new Dictionary<int, int>();
+                // Build a dictionary mapping candidate num → indexes of appearances in the row.
+                Dictionary<int, List<int>> keyValuePairs = new Dictionary<int, List<int>>();
                 for (int num = 1; num <= N; num++)
                 {
-                    if (colUsed[col, num])
+                    if (rowUsed[col, num])
                         continue;
-                    keyValuePairs[num] = 0;
+
                     for (int row = 0; row < N; row++)
                     {
                         if (board[row, col] == 0 && candidates[row, col].Contains(num))
                         {
-                            keyValuePairs[num]++;
+                            if (!keyValuePairs.ContainsKey(num))
+                                keyValuePairs[num] = new List<int> { row };
+                            else
+                                keyValuePairs[num].Add(row);
                         }
                     }
                 }
-                List<int> hiddenNums = new List<int>();
-                foreach (int num in keyValuePairs.Keys)
+                foreach (int hNum1 in keyValuePairs.Keys)
                 {
-                    if (keyValuePairs[num] == 2)
+                    if (keyValuePairs[hNum1].Count == 2)
                     {
-                        hiddenNums.Add(num);
-                    }
-                }
-                Dictionary<int, List<int>> hiddenCells = new Dictionary<int, List<int>>();
-                for (int row = 0; row < N; row++)
-                {
-                    if (board[row, col] == 0)
-                    {
-                        foreach (int num in hiddenNums)
+                        int hRow1 = keyValuePairs[hNum1].First();
+                        int hRow2 = keyValuePairs[hNum1].Last();
+                        HashSet<int> values = new HashSet<int>();
+                        foreach (int hNum2 in keyValuePairs.Keys)
                         {
-                            if (candidates[row, col].Contains(num))
+                            if (keyValuePairs[hNum2].Count == 2 &&
+                                keyValuePairs[hNum2].Contains(hRow1) &&
+                                keyValuePairs[hNum2].Contains(hRow2))
                             {
-                                if (!hiddenCells.ContainsKey(row))
-                                    hiddenCells[row] = new List<int> { num };
-                                else
-                                    hiddenCells[row].Add(num);
+                                values.Add(hNum2);
                             }
                         }
+                        if (values.Count == 2)
+                        {
+                            candidates[col, hRow1] = new HashSet<int>(values);
+                            result = Result.Changed;
+                        }
+                        if (values.Count > 2)
+                        {
+                            return Result.Contradiction;
+                        }
                     }
                 }
-                foreach (int hRow in hiddenCells.Keys)
-                {
-                    if (hiddenCells[hRow].Count > 2)
-                    {
-                        return Result.Contradiction;
-                    }
-                    else if (hiddenCells[hRow].Count == 2 && candidates[hRow, col].Count > 2)
-                    {
-                        candidates[hRow, col] = new HashSet<int>(hiddenCells[hRow]);
-                        result = Result.Changed;
-                    }
-                }
+
             }
             return result;
         }
@@ -166,111 +152,83 @@ namespace Omega_Sudoku
         public static Result FindHiddenPairsInBox(int[,] board)
         {
             Result result = Result.NoChange;
-            // There are N boxes (e.g., 9 boxes for a 9x9 board)
+            // There are N boxes in an N×N puzzle (with N being a perfect square).
             for (int box = 0; box < N; box++)
             {
-                Dictionary<int, int> keyValuePairs = new Dictionary<int, int>();
+                Console.WriteLine("test");
+                // Compute starting row and column for this box.
+                int startRow = (box / MiniSquare) * MiniSquare;
+                int startCol = (box % MiniSquare) * MiniSquare;
+
+                // Build a dictionary mapping candidate number → list of positions (row, col)
+                // in the current box where that candidate appears.
+                Dictionary<int, List<(int, int)>> keyValuePairs = new Dictionary<int, List<(int, int)>>();
                 for (int num = 1; num <= N; num++)
                 {
                     if (boxUsed[box, num])
                         continue;
-                    keyValuePairs[num] = 0;
-                }
-                int startRow = (box / MiniSquare) * MiniSquare;
-                int startCol = (box % MiniSquare) * MiniSquare;
-                for (int r = startRow; r < startRow + MiniSquare; r++)
-                {
-                    for (int c = startCol; c < startCol + MiniSquare; c++)
+
+                    // Initialize an empty list for candidate num.
+                    keyValuePairs[num] = new List<(int, int)>();
+
+                    // Iterate over every cell in the box.
+                    for (int r = startRow; r < startRow + MiniSquare; r++)
                     {
-                        if (board[r, c] == 0)
+                        for (int c = startCol; c < startCol + MiniSquare; c++)
                         {
-                            foreach (int num in keyValuePairs.Keys.ToList())
+                            if (board[r, c] == 0 && candidates[r, c].Contains(num))
                             {
-                                if (candidates[r, c].Contains(num))
-                                {
-                                    keyValuePairs[num]++;
-                                }
+                                keyValuePairs[num].Add((r, c));
                             }
                         }
                     }
                 }
-                List<int> hiddenNums = new List<int>();
-                foreach (int num in keyValuePairs.Keys)
+
+                // Now, for each candidate that appears exactly twice in the box, try to form a hidden pair.
+                foreach (int hNum1 in keyValuePairs.Keys)
                 {
-                    if (keyValuePairs[num] == 2)
+                    if (keyValuePairs[hNum1].Count == 2)
                     {
-                        hiddenNums.Add(num);
-                    }
-                }
-                // Map each cell (identified by its row and column in the box) to a list of candidate numbers from hiddenNums.
-                Dictionary<(int, int), List<int>> hiddenCells = new Dictionary<(int, int), List<int>>();
-                for (int r = startRow; r < startRow + MiniSquare; r++)
-                {
-                    for (int c = startCol; c < startCol + MiniSquare; c++)
-                    {
-                        if (board[r, c] == 0)
+                        // Get the two positions where hNum1 appears.
+                        var pair = keyValuePairs[hNum1];
+                        // Build a union of candidate numbers that appear exactly in these same two cells.
+                        HashSet<int> unionCandidates = new HashSet<int>();
+                        foreach (int hNum2 in keyValuePairs.Keys)
                         {
-                            foreach (int num in hiddenNums)
+                            if (keyValuePairs[hNum2].Count == 2 && 
+                                keyValuePairs[hNum2].Contains(pair.First()) && 
+                                keyValuePairs[hNum2].Contains(pair.Last()))
                             {
-                                if (candidates[r, c].Contains(num))
-                                {
-                                    var cell = (r, c);
-                                    if (!hiddenCells.ContainsKey(cell))
-                                        hiddenCells[cell] = new List<int> { num };
-                                    else
-                                        hiddenCells[cell].Add(num);
-                                }
+                                unionCandidates.Add(hNum2);                                
                             }
                         }
-                    }
-                }
-                // Now, for each cell in the box, if it has more than 2 hidden candidate numbers, that is a contradiction.
-                foreach (var kvp in hiddenCells)
-                {
-                    if (kvp.Value.Count > 2)
-                    {
-                        return  Result.Contradiction;
-                    }
-                }
-                // Alternatively, we can scan pairs by grouping candidate numbers by the cells they appear in.
-                // Here we use a simpler approach similar to the row and column routines:
-                // For every unordered pair (a, b) in hiddenNums, collect all cells in the box where either appears.
-                List<int> nums = hiddenNums; // already collected
-                for (int i = 0; i < nums.Count; i++)
-                {
-                    for (int j = i + 1; j < nums.Count; j++)
-                    {
-                        int a = nums[i], b = nums[j];
-                        HashSet<(int, int)> unionCells = new HashSet<(int, int)>();
-                        for (int r = startRow; r < startRow + MiniSquare; r++)
+
+                        // If exactly two candidate numbers share these two cells, we have a hidden pair.
+                        if (unionCandidates.Count == 2)
                         {
-                            for (int c = startCol; c < startCol + MiniSquare; c++)
+                            // Restrict each of the two cells’ candidate sets to exactly that pair.
+                            foreach (var pos in pair)
                             {
-                                if (board[r, c] == 0 && candidates[r, c].Contains(a) || candidates[r, c].Contains(b))
-                                {
-                                    unionCells.Add((r, c));
-                                }
+                                int r = pos.Item1;
+                                int c = pos.Item2;
+                                candidates[r, c] = new HashSet<int>(unionCandidates);
+                                result = Result.Changed;
+                                Console.WriteLine("hi");
                             }
                         }
-                        if (unionCells.Count == 2)
+                        Console.WriteLine("hello");
+                        // If more than 2 candidates appear exactly in these two cells, that is a contradiction.
+                        if (unionCandidates.Count > 2)
                         {
-                            // For each cell in this union, restrict its candidate set to {a, b}
-                            foreach (var (r, c) in unionCells)
-                            {
-                                HashSet<int> oldSet = new HashSet<int>(candidates[r, c]);
-                                HashSet<int> newSet = new HashSet<int>(oldSet.Intersect(new int[] { a, b }));
-                                if (newSet.Count < oldSet.Count)
-                                {
-                                    candidates[r, c] = newSet;
-                                    result = Result.Changed;
-                                }
-                            }
+                            return Result.Contradiction;
                         }
                     }
                 }
             }
             return result;
         }
+
+
 
 
         /// <summary>
@@ -311,6 +269,9 @@ namespace Omega_Sudoku
         /// </summary>
         public static Result RepeatHiddenPairs(int[,] board)
         {
+            N = Globals.N;
+            MiniSquare = Globals.MiniSquare;
+             
             var savedState = LogicHelpers.CloneState(board);
             Result result;
             do
@@ -319,10 +280,11 @@ namespace Omega_Sudoku
                 // If a contradiction is found at any point, restore and return.
                 if (result == Result.Contradiction)
                 {
-                    LogicHelpers.RestoreState(savedState, board);
+                    //LogicHelpers.RestoreState(savedState, board);
                     return Result.Contradiction;
                 }
             } while (result == Result.Changed);
+            if(result == Result.Contradiction)
 
             // After hidden pairs processing, check for contradictions in any empty cell.
             for (int r = 0; r < N; r++)

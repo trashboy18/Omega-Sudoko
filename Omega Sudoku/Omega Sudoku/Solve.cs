@@ -9,11 +9,13 @@ namespace Omega_Sudoku
     {
         public static bool SolveSudoku(int[,] board)
         {
+            var savedState = LogicHelpers.CloneState(board);
             if (!HeuristicSolver.HeuristicSolving(board))
             {
+                Console.WriteLine("not good");
                return false;
             }
-            
+            Console.WriteLine("i was here");
             //find the empty cell with the fewest candidates using MRV.
             (int row, int col, HashSet<int> cellCandidates) = LogicHelpers.FindCellWithMRV(board);
 
@@ -39,7 +41,7 @@ namespace Omega_Sudoku
                 }
 
                 //clone the current state before guessing.
-                var savedState = LogicHelpers.CloneState(board);
+                 savedState = LogicHelpers.CloneState(board);
 
                 //place the candidate number on the clone.
                 LogicHelpers.PlaceNum(board, row, col, num);

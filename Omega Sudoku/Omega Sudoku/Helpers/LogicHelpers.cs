@@ -13,13 +13,7 @@ namespace Omega_Sudoku
         public static int N;
         public static int MiniSquare;
 
-        //for each row, col, box, true means digit is used in row.
-        public static bool[,] rowUsed;
-        public static bool[,] colUsed;
-        public static bool[,] boxUsed;
-
-        //for forward checking with MRV
-        public static HashSet<int>[,] candidates;
+        
 
         //called once from BasicHelpers.SolveProcess, after parsing the board
         public static void InitializeCells(int[,] board)
@@ -32,17 +26,17 @@ namespace Omega_Sudoku
             MiniSquare = (int)Math.Sqrt(N);
 
             //initialize the usage arrays
-            rowUsed = new bool[N, N + 1];
-            colUsed = new bool[N, N + 1];
-            boxUsed = new bool[N, N + 1];
+            Globals.rowUsed = new bool[N, N + 1];
+            Globals.colUsed = new bool[N, N + 1];
+            Globals.boxUsed = new bool[N, N + 1];
 
             //create the candidate sets for each cell
-            candidates = new HashSet<int>[N, N];
+            Globals.candidates = new HashSet<int>[N, N];
             for (int r = 0; r < N; r++)
             {
                 for (int c = 0; c < N; c++)
                 {
-                    candidates[r, c] = new HashSet<int>();
+                    Globals.candidates[r, c] = new HashSet<int>();
                 }
             }
 
@@ -55,9 +49,9 @@ namespace Omega_Sudoku
                     if (num != 0)
                     {
                         // Mark usage
-                        rowUsed[r, num] = true;
-                        colUsed[c, num] = true;
-                        boxUsed[BoxIndex(r, c), num] = true;
+                        Globals.rowUsed[r, num] = true;
+                        Globals.colUsed[c, num] = true;
+                        Globals.boxUsed[BoxIndex(r, c), num] = true;
                     }
                 }
             }
@@ -74,7 +68,7 @@ namespace Omega_Sudoku
                         {
                             if (IsSafe(r, c, d))
                             {
-                                candidates[r, c].Add(d);
+                                Globals.candidates[r, c].Add(d);
                             }
                         }
                     }
@@ -95,9 +89,11 @@ namespace Omega_Sudoku
         public static bool IsSafe(int row, int col, int num)
         {
             int b = BoxIndex(row, col);
-            if (rowUsed[row, num]) return false;
-            if (colUsed[col, num]) return false;
-            if (boxUsed[b, num]) return false;
+            if (Globals.rowUsed[row, num]) return false;
+            if (Globals.colUsed[col, num]) return false;
+            if (Globals.boxUsed[b, num]) return false;
+            Console.WriteLine("problem1");
+
             return true;
         }
         //finds the empty cell with the fewest candidates, returns (-1,-1, empty) if solved
@@ -114,13 +110,13 @@ namespace Omega_Sudoku
                 {
                     if (board[r, c] == 0)
                     {
-                        int count = candidates[r, c].Count;
+                        int count = Globals.candidates[r, c].Count;
                         if (count < bestCount)
                         {
                             bestCount = count;
                             bestRow = r;
                             bestCol = c;
-                            bestCandidates = candidates[r, c];
+                            bestCandidates = Globals.candidates[r, c];
 
                             if (bestCount == 0)
                             {
@@ -146,19 +142,19 @@ namespace Omega_Sudoku
         public static void PlaceNum(int[,] board, int row, int col, int num)
         {
             board[row, col] = num;
-            rowUsed[row, num] = true;
-            colUsed[col, num] = true;
-            boxUsed[BoxIndex(row, col), num] = true;
-            candidates[row, col].Clear();
+            Globals.rowUsed[row, num] = true;
+            Globals.colUsed[col, num] = true;
+            Globals.boxUsed[BoxIndex(row, col), num] = true;
+            Globals.candidates[row, col].Clear();
         }
 
         // Removes digit from board, usage arrays
         public static void RemoveNum(int[,] board, int row, int col, int num)
         {
             board[row, col] = 0;
-            rowUsed[row, num] = false;
-            colUsed[col, num] = false;
-            boxUsed[BoxIndex(row, col), num] = false;
+            Globals.rowUsed[row, num] = false;
+            Globals.colUsed[col, num] = false;
+            Globals.boxUsed[BoxIndex(row, col), num] = false;
         }
 
         //removes digit from empty neighbors' candidate sets, ignoring filled neighbors
@@ -185,9 +181,9 @@ namespace Omega_Sudoku
             {
                 if (cc != col && board[row, cc] == 0)
                 {
-                    if (candidates[row, cc].Remove(num))
+                    if (Globals.candidates[row, cc].Remove(num))
                     {
-                        if (candidates[row, cc].Count == 0) return false;
+                        if (Globals.candidates[row, cc].Count == 0) return false;
                     }
                 }
             }
@@ -200,9 +196,9 @@ namespace Omega_Sudoku
             {
                 if (rr != row && board[rr, col] == 0)
                 {
-                    if (candidates[rr, col].Remove(num))
+                    if (Globals.candidates[rr, col].Remove(num))
                     {
-                        if (candidates[rr, col].Count == 0) return false;
+                        if (Globals.candidates[rr, col].Count == 0) return false;
                     }
                 }
             }
@@ -221,9 +217,9 @@ namespace Omega_Sudoku
                     int nc = startCol + cc;
                     if ((nr != row || nc != col) && board[nr, nc] == 0)
                     {
-                        if (candidates[nr, nc].Remove(num))
+                        if (Globals.candidates[nr, nc].Remove(num))
                         {
-                            if (candidates[nr, nc].Count == 0) return false;
+                            if (Globals.candidates[nr, nc].Count == 0) return false;
                         }
                     }
                 }
@@ -236,28 +232,29 @@ namespace Omega_Sudoku
         {
             foreach (var (nr, nc, remDigit) in removedCandidates)
             {
-                candidates[nr, nc].Add(remDigit);
+                Globals.candidates[nr, nc].Add(remDigit);
             }
             removedCandidates.Clear();
         }
 
 
 
-        public static int[,] CloneBoard(int[,] board, int rows, int cols)
+        public static int[,] CloneBoard(int[,] board)
         {
             //clone board
-            int[,] boardClone = new int[rows, cols];
-            for (int i = 0; i < rows; i++)
-                for (int j = 0; j < cols; j++)
-                    boardClone[i, j] = board[i, j];
+            
+            int[,] boardClone = new int[N,N];
+            for(int row = 0; row < N;row++)
+                for (int col = 0; col < N;col++)
+                    boardClone[row,col] = board[row,col];
             return boardClone;
         }
-        public static HashSet<int>[,] CloneCandidates(int rows, int cols)
+        public static HashSet<int>[,] CloneCandidates()
         {
-            HashSet<int>[,] candidatesClone = new HashSet<int>[rows, cols];
-            for (int i = 0; i < rows; i++)
-                for (int j = 0; j < cols; j++)
-                    candidatesClone[i, j] = new HashSet<int>(candidates[i, j]);
+            HashSet<int>[,] candidatesClone = new HashSet<int>[N, N];
+            for (int i = 0; i < N; i++)
+                for (int j = 0; j < N; j++)
+                    candidatesClone[i, j] = new HashSet<int>(Globals.candidates[i, j]);
             return candidatesClone;
         }
 
@@ -266,18 +263,17 @@ namespace Omega_Sudoku
             bool[,] boxUsedClone, HashSet<int>[,] candidatesClone)
             CloneState(int[,] board)
         {
-            int rows = board.GetLength(0);
-            int cols = board.GetLength(1);
+            
 
-            int[,] boardClone = CloneBoard(board, rows, cols);
+            int[,] boardClone = CloneBoard(board);
             //clone usage arrays
-            bool[,] rowUsedClone = (bool[,])rowUsed.Clone();
-            bool[,] colUsedClone = (bool[,])colUsed.Clone();
-            bool[,] boxUsedClone = (bool[,])boxUsed.Clone();
+            bool[,] rowUsedClone = (bool[,])Globals.rowUsed.Clone();
+            bool[,] colUsedClone = (bool[,])Globals.colUsed.Clone();
+            bool[,] boxUsedClone = (bool[,])Globals.boxUsed.Clone();
 
             //clone candidate sets: create new HashSet for each cell
 
-            HashSet<int>[,] candidatesClone = CloneCandidates(rows, cols);
+            HashSet<int>[,] candidatesClone = CloneCandidates();
 
 
             return (boardClone, rowUsedClone, colUsedClone, boxUsedClone, candidatesClone);
@@ -289,21 +285,19 @@ namespace Omega_Sudoku
             bool[,] boxUsedClone, HashSet<int>[,] candidatesClone) state,
             int[,] board)
         {
+            //copy back the board values
             int rows = board.GetLength(0);
             int cols = board.GetLength(1);
-
-            //copy back the board values
-            for (int i = 0; i < rows; i++)
-                for (int j = 0; j < cols; j++)
-                    board[i, j] = state.boardClone[i, j];
+            for(int row = 0; row < rows; row++) 
+                for(int col = 0; col < cols;)
+                {
+                    board[row,col] = state.boardClone[row,col];
+                }
             //restore the static global state
-            rowUsed = state.rowUsedClone;
-            colUsed = state.colUsedClone;
-            boxUsed = state.boxUsedClone;
-            candidates = state.candidatesClone;
-
+            Globals.rowUsed = state.rowUsedClone;
+            Globals.colUsed = state.colUsedClone;
+            Globals.boxUsed = state.boxUsedClone;
+            Globals.candidates = state.candidatesClone;
         }
-
-
     }
 }
