@@ -92,8 +92,6 @@ namespace Omega_Sudoku
             if (Globals.rowUsed[row, num]) return false;
             if (Globals.colUsed[col, num]) return false;
             if (Globals.boxUsed[b, num]) return false;
-            Console.WriteLine("problem1");
-
             return true;
         }
         //finds the empty cell with the fewest candidates, returns (-1,-1, empty) if solved
@@ -165,9 +163,11 @@ namespace Omega_Sudoku
             // row
             if (!RemoveCandidatesFromRow(board, row, col, num))
                 return false;
+
             // col
             if (!RemoveCandidatesFromCol(board, row, col, num))
                 return false;
+
             // box
 
             if (!RemoveCandidatesFromBox(board, row, col, num))
@@ -179,7 +179,7 @@ namespace Omega_Sudoku
         {
             for (int cc = 0; cc < N; cc++)
             {
-                if (cc != col && board[row, cc] == 0)
+                if (cc != col && board[row, cc] == 0)   
                 {
                     if (Globals.candidates[row, cc].Remove(num))
                     {
@@ -289,7 +289,7 @@ namespace Omega_Sudoku
             int rows = board.GetLength(0);
             int cols = board.GetLength(1);
             for(int row = 0; row < rows; row++) 
-                for(int col = 0; col < cols;)
+                for(int col = 0; col < cols;col++)
                 {
                     board[row,col] = state.boardClone[row,col];
                 }
