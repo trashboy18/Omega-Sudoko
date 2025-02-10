@@ -21,7 +21,6 @@ namespace Omega_Sudoku
         {
             
             Result result = Result.NoChange;
-            Console.WriteLine(N);
             for (int row = 0; row < N; row++)
             {
                 // Build a dictionary mapping candidate num → indexes of appearances in the row.
@@ -60,8 +59,11 @@ namespace Omega_Sudoku
                         }
                         if(values.Count == 2)
                         {
-                            Globals.candidates[row,hCol1] = new HashSet<int>(values);
-                            result = Result.Changed;
+                            if (!Globals.candidates[row, hCol1].SetEquals(values))
+                            {
+                                Globals.candidates[row, hCol1] = new HashSet<int>(values);
+                                result = Result.Changed;
+                            }
                         }
                         if(values.Count > 2)
                         {
@@ -120,8 +122,11 @@ namespace Omega_Sudoku
                         }
                         if (values.Count == 2)
                         {
-                            Globals.candidates[col, hRow1] = new HashSet<int>(values);
-                            result = Result.Changed;
+                            if (!Globals.candidates[hRow1, col].SetEquals(values))
+                            {
+                                Globals.candidates[hRow1, col] = new HashSet<int>(values);
+                                result = Result.Changed;
+                            }
                         }
                         if (values.Count > 2)
                         {
@@ -145,7 +150,6 @@ namespace Omega_Sudoku
             // There are N boxes in an N×N puzzle (with N being a perfect square).
             for (int box = 0; box < N; box++)
             {
-                Console.WriteLine("test");
                 // Compute starting row and column for this box.
                 int startRow = (box / MiniSquare) * MiniSquare;
                 int startCol = (box % MiniSquare) * MiniSquare;
@@ -201,8 +205,12 @@ namespace Omega_Sudoku
                             {
                                 int r = pos.Item1;
                                 int c = pos.Item2;
-                                Globals.candidates[r, c] = new HashSet<int>(unionCandidates);
-                                result = Result.Changed;
+                                if (!Globals.candidates[r, c].SetEquals(unionCandidates))
+                                {
+                                    Globals.candidates[r, c] = new HashSet<int>(unionCandidates);
+                                    result = Result.Changed;
+                                }
+
                             }
                         }
                         // If more than 2 candidates appear exactly in these two cells, that is a contradiction.
@@ -239,7 +247,7 @@ namespace Omega_Sudoku
             Result boxResult = FindHiddenPairsInBox(board);
             if (boxResult == Result.Contradiction)
                 return Result.Contradiction;
-
+            
             // If any of them changed the state, report Changed; otherwise, NoChange.
             if (rowResult == Result.Changed ||
                 colResult == Result.Changed ||
@@ -264,24 +272,13 @@ namespace Omega_Sudoku
             do
             {
                 result = FindHiddenPairsAll(board);
-                
             } while (result == Result.Changed);
             // If a contradiction is found at any point, restore and return.
             if (result == Result.Contradiction)
             {
                 return Result.Contradiction;
             }
-            // After hidden pairs processing, check for contradictions in any empty cell.
-            for (int r = 0; r < N; r++)
-            {
-                for (int c = 0; c < N; c++)
-                {
-                    if (board[r, c] == 0 && Globals.candidates[r, c].Count == 0)
-                    {
-                        return Result.Contradiction;
-                    }
-                }
-            }
+            
             return Result.NoChange;
         }
 
