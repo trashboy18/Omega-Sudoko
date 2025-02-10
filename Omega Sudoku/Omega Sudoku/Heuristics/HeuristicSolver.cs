@@ -33,6 +33,7 @@ namespace Omega_Sudoku.Heuristics
             if (hpResult == Result.Contradiction)
             {
                 //Hidden pairs processing detected a contradiction; backtrack.
+
                 return false;
             }
 
