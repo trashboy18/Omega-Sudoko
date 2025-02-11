@@ -27,6 +27,11 @@ namespace Omega_Sudoku.Heuristics
                 //hidden singles produced a contradiction; backtrack.
                 return false;
             }
+            Result npResult = NakedPairs.RepeatNakedPairs(board);
+            if(npResult == Result.Contradiction)
+            {
+                return false;
+            }
             //apply hidden pairs repeatedly.
             Result hpResult = HiddenPairs.RepeatHiddenPairs(board);
             if (hpResult == Result.Contradiction)
@@ -36,7 +41,8 @@ namespace Omega_Sudoku.Heuristics
                 return false;
             }
             //if any change was made, go back and re-do the heuristics.
-            if (hsResult == Result.Changed || hpResult == Result.Changed)
+            if (hsResult == Result.Changed || hpResult == Result.Changed ||
+                nsResult == Result.Changed)
                 HeuristicSolving(board);
             return true;
         }
