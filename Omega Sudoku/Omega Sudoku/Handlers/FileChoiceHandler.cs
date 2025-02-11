@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Omega_Sudoku.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -17,29 +18,36 @@ namespace Omega_Sudoku.Handlers
             if (!File.Exists(filePath))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("File not found. Please try again.");
+                Console.WriteLine("File not found. Make sure you write the full path " +
+                    "correctly, or ensure it is located inside bin/debug.");
                 Console.ResetColor();
             }
             try
             {
                 string puzzleString = File.ReadAllText(filePath).Trim();
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("An appropriate output is now inside the input file.");
+
+                Console.ResetColor();
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
                 StringBuilder solvedBoard = BasicHelpers.SolveProcess(puzzleString);
                 sw.Stop();
+                File.WriteAllText(filePath, solvedBoard.ToString());
                 Console.WriteLine($"Sudoku solved in {sw.ElapsedMilliseconds} ms");
 
+
                 // Write the formatted solved board back into the file.
-                File.WriteAllText(filePath, solvedBoard.ToString());
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("An appropriate output is now in the input file.");
-                Console.ResetColor();
+
             }
-            catch (Exception ex)
+            catch (SudokuException se)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Error: " + ex.Message);
+                string output = "an error occured: " + se.Message;
+                Console.WriteLine(output);
+                File.WriteAllText (filePath,output);  
                 Console.ResetColor();
+
             }
 
         }

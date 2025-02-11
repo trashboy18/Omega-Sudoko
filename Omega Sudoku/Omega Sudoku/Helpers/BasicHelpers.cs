@@ -49,7 +49,7 @@ namespace Omega_Sudoku
                     if (c > 0 && c % mini == 0)
                         sb.Append("| ");
                     int num = board[r, c];
-                    string cell = num == 0 ? "0" : num.ToString();
+                    char cell = num == 0 ? '0' : (char)('0'+num);
                     sb.Append(cell + " ");
                 }
                 sb.AppendLine();
@@ -172,15 +172,11 @@ namespace Omega_Sudoku
             }
             catch (SudokuException es)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                string msg = "An error occurred: " + es.Message;
-                StringBuilder output = new StringBuilder(msg);
-                return output;
+                
+                throw new SudokuException(es.Message);
+                
             }
-            catch (Exception e)
-            {
-                 Console.WriteLine("Couldn't find the reason for crashing." + e.Message);
-            }
+            
         }
     }
 }
