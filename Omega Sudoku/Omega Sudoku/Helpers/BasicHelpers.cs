@@ -51,18 +51,7 @@ namespace Omega_Sudoku
             }
             return sb.ToString();
         }
-        private static void PrintHorizontalSeparator(int boxSize, int N)
-        {
-            for (int i = 0; i < N; i++)
-            {
-                Console.Write("--");
-                if ((i + 1) % boxSize == 0 && i != Globals.N - 1)
-                {
-                    Console.Write("+");
-                }
-            }
-            Console.WriteLine();
-        }
+        
         //check if the input represents a sudoku board
         public static void CheckStringValidity(string input)
         {
