@@ -36,8 +36,9 @@ namespace Omega_Sudoku.Heuristics
 
                 return false;
             }
-
-
+            //if any change was made, go back and re-do the heuristics.
+            if (hsResult == Result.Changed || hpResult == Result.Changed)
+                HeuristicSolving(board);
             return true;
         }
     }

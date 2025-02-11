@@ -240,20 +240,21 @@ namespace Omega_Sudoku
         {
             N = Globals.N;
             MiniSquare = Globals.MiniSquare;
-            //var savedState = LogicHelpers.CloneState(board);
+            int count = 0;
             Result result;
             do
             {
+                count++;
                 result = FindHiddenSinglesAll(board);
                 
             } while (result == Result.Changed);
-
             if (result == Result.Contradiction)
             {
-               // LogicHelpers.RestoreState(savedState, board);
                 return Result.Contradiction;
             }
-            
+
+            if (count > 1)
+                return Result.Changed;
             return Result.NoChange;
         }
     }

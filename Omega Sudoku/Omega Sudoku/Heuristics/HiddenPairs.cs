@@ -267,10 +267,11 @@ namespace Omega_Sudoku
         {
             N = Globals.N;
             MiniSquare = Globals.MiniSquare;
-             
+            int count = 0;
             Result result;
             do
             {
+                count++;
                 result = FindHiddenPairsAll(board);
             } while (result == Result.Changed);
             // If a contradiction is found at any point, restore and return.
@@ -278,7 +279,8 @@ namespace Omega_Sudoku
             {
                 return Result.Contradiction;
             }
-            
+            if (count > 1)
+                return Result.Changed;
             return Result.NoChange;
         }
 
