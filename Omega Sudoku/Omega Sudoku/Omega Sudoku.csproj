@@ -46,6 +46,8 @@
     <Compile Include="Conversions.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="Globals.cs" />
+    <Compile Include="Handlers\ConsoleChoiceHandler.cs" />
+    <Compile Include="Handlers\FileChoiceHandler.cs" />
     <Compile Include="Helpers\BasicHelpers.cs" />
     <Compile Include="Helpers\Enum.cs" />
     <Compile Include="Heuristics\HeuristicSolver.cs" />

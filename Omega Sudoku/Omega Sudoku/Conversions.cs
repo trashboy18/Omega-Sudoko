@@ -65,7 +65,10 @@ namespace Omega_Sudoku
                 throw new InvalidCellsAmountException($"Board must be NxN. Found {N}x{board.GetLength(1)}.");
             }
 
-            StringBuilder sb = new StringBuilder(N * N);
+            StringBuilder sb = new StringBuilder();
+            string beginning = "Here is the solved board as a string:";
+            sb.AppendLine(beginning);
+
             for (int r = 0; r < N; r++)
             {
                 for (int c = 0; c < N; c++)

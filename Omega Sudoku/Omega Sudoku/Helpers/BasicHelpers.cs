@@ -13,16 +13,19 @@ namespace Omega_Sudoku
 
 
         //print sudoku board.
-        public static void PrintBoard(int[,] board)
+        public static StringBuilder FinalBoard(int[,] board)
         {
             int boxSize = Globals.MiniSquare; // Typically 3 for a 9x9 Sudoku
 
-            Console.WriteLine($"Sudoku solved! Here is the {Globals.N}×{Globals.N} solution:\n");
-
-            string boardStr = GetFormattedBoard(board);
+            StringBuilder output = new StringBuilder();
+            string boardPrint = GetFormattedBoard(board);
+            string boardStr = Conversions.BoardToString(board);
+            output.AppendLine(boardPrint);
+            output.AppendLine(boardStr);
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(boardStr);
+            Console.WriteLine(output);
             Console.ResetColor();
+            return output;
         }
 
         public static string GetFormattedBoard(int[,] board)
@@ -30,7 +33,9 @@ namespace Omega_Sudoku
             int N = Globals.N;
             int mini = Globals.MiniSquare;
             StringBuilder sb = new StringBuilder();
+            string beggining = $"Sudoku solved! Here is the {Globals.N}×{Globals.N} solution:\n";
 
+            sb.AppendLine(beggining);
             for (int r = 0; r < N; r++)
             {
                 if (r > 0 && r % mini == 0)
@@ -141,7 +146,7 @@ namespace Omega_Sudoku
         }
 
         //calls various function to solve the sudoku.
-        public static void SolveProcess(string input)
+        public static StringBuilder SolveProcess(string input)
         {
             try
             {
@@ -162,13 +167,15 @@ namespace Omega_Sudoku
                     throw new UnsolveableSudokuException("This Sudoku puzzle is unsolvable!");
                 }
                 //sudoku solved!
-                PrintBoard(board);
+               StringBuilder output = FinalBoard(board);
+                return output; 
             }
             catch (SudokuException e)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("An error occurred: " + e.Message);
-                Console.ResetColor();
+                string msg = "An error occurred: " + e.Message;
+                StringBuilder output = new StringBuilder(msg);
+                return output;
             }
             //catch (Exception e)
             {
