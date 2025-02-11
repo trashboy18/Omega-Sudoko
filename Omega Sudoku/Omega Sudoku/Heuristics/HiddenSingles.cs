@@ -90,6 +90,9 @@ namespace Omega_Sudoku
 
             for (int col = 0; col < N; col++)
             {
+                // Build a dictionary mapping candidate number:count
+                // of appearances in this col.
+
                 Dictionary<int, int> keyValuePairs = new Dictionary<int, int>();
                 for (int num = 1; num <= N; num++)
                 {
@@ -104,10 +107,15 @@ namespace Omega_Sudoku
                         }
                     }
                 }
+                // For each candidate that appears exactly once in the col,
+                // try to place it.
+
                 foreach (int num in keyValuePairs.Keys)
                 {
                     if (keyValuePairs[num] == 1)
                     {
+                        // Find the unique cell in this col that contains the candidate.
+
                         for (int row = 0; row < N; row++)
                         {
                             if (board[row, col] == 0 && Globals.candidates[row, col].Contains(num))
@@ -145,6 +153,7 @@ namespace Omega_Sudoku
         /// Process hidden singles in each box.
         /// Returns Changed if at least one placement was made,
         /// Contradiction if one is found, otherwise NoChange.
+        /// (it's basically the same algorithm.)
         /// </summary>
         public static Result FindHiddenSinglesInBox(int[,] board)
         {
@@ -234,7 +243,7 @@ namespace Omega_Sudoku
         }
 
         /// <summary>
-        /// 
+        /// while changes are made becuase of the hidden singles, repeat doing it.
         /// </summary>
         public static Result RepeatHiddenSingles(int[,] board)
         {
