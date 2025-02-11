@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Omega_Sudoku.Helpers.Enum; // Bring in the Result enum
+using static Omega_Sudoku.Helpers.Enum; 
 
 namespace Omega_Sudoku.Heuristics
 {

@@ -9,7 +9,6 @@ namespace Omega_Sudoku
 {
     internal class HiddenSingles
     {
-        // Assume these static variables are shared with your LogicHelpers (or are initialized there)
         public static int N;
         public static int MiniSquare;
         
