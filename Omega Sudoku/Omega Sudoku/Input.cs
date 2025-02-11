@@ -10,9 +10,11 @@ namespace Omega_Sudoku
         {
             while (true)
             {
-                
-                Console.WriteLine("\nEnter a Sudoku puzzle string (e.g. length 81 for 9×9, 256 for 16×16).");
-                Console.WriteLine("Type 'exit' to quit.");
+
+                Console.WriteLine("select your desired input method:");
+                Console.WriteLine("1 - Console");
+                Console.WriteLine("2 - text file");
+                Console.WriteLine("to close, type 'exit'");
                 string puzzleString = Console.ReadLine().Trim();
                 if (puzzleString.Equals("exit"))
                 {
