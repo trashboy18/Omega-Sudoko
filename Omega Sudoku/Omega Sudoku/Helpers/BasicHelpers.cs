@@ -19,28 +19,37 @@ namespace Omega_Sudoku
 
             Console.WriteLine($"Sudoku solved! Here is the {Globals.N}×{Globals.N} solution:\n");
 
-            for (int r = 0; r < Globals.N; r++)
+            string boardStr = GetFormattedBoard(board);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(boardStr);
+            Console.ResetColor();
+        }
+
+        public static string GetFormattedBoard(int[,] board)
+        {
+            int N = Globals.N;
+            int mini = Globals.MiniSquare;
+            StringBuilder sb = new StringBuilder();
+
+            for (int r = 0; r < N; r++)
             {
-                //print horizontal separators after each box row, except after the last row
-                if (r % boxSize == 0 && r != 0)
+                if (r > 0 && r % mini == 0)
                 {
-                    PrintHorizontalSeparator(boxSize, Globals.N);
+                    for (int i = 0; i < N * 2 + mini - 1; i++)
+                        sb.Append("-");
+                    sb.AppendLine();
                 }
-
-                for (int c = 0; c < Globals.N; c++)
+                for (int c = 0; c < N; c++)
                 {
-                    //print vertical separators after each box column, except after the last column
-                    if (c % boxSize == 0 && c != 0)
-                    {
-                        Console.Write("| ");
-                    }
-
-                    //Convert the number to a character. If the cell is empty (0), print a dot.
-                    char ch = board[r, c] != 0 ? (char)('0' + board[r, c]) : '.';
-                    Console.Write(ch + " ");
+                    if (c > 0 && c % mini == 0)
+                        sb.Append("| ");
+                    int num = board[r, c];
+                    string cell = num == 0 ? "0" : num.ToString();
+                    sb.Append(cell + " ");
                 }
-                Console.WriteLine(); // Move to the next line after each row
+                sb.AppendLine();
             }
+            return sb.ToString();
         }
         private static void PrintHorizontalSeparator(int boxSize, int N)
         {
@@ -168,17 +177,14 @@ namespace Omega_Sudoku
             }
             catch (SudokuException e)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("An error occurred: " + e.Message);
-
+                Console.ResetColor();
             }
             //catch (Exception e)
             {
                 //  Console.WriteLine("Couldn't find the reason for crashing.");
             }
-
         }
-
-
-
     }
 }
