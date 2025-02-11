@@ -34,7 +34,7 @@ namespace Omega_Sudoku.Handlers
                 Console.ResetColor();
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
-                StringBuilder solvedBoard = BasicHelpers.SolveProcess(puzzleString);
+                StringBuilder solvedBoard = BasicHelpers.SolveProcess(puzzleString).Item1;
                 sw.Stop();
                 File.WriteAllText(filePath, solvedBoard.ToString());
                 Console.WriteLine($"Sudoku solved in {sw.ElapsedMilliseconds} ms");

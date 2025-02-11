@@ -31,14 +31,23 @@ namespace Omega_Sudoku.Exceptions
     public class UnsolveableSudokuException : SudokuException
     {
         public UnsolveableSudokuException(string message)
-            : base(message) 
-        { 
+            : base(message)
+        {
         }
 
     }
     public class InvalidUserChoice : SudokuException
     {
         public InvalidUserChoice(string message)
+            : base(message)
+        {
+            {
+            }
+        }
+    }
+    public class InvalidBoard : SudokuException
+    {
+        public InvalidBoard(string message)
             : base(message)
         {
             {
