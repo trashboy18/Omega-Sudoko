@@ -1,6 +1,8 @@
 ﻿using Omega_Sudoku.Exceptions;
+using Omega_Sudoku.UI;
 using System;
 using System.Diagnostics;
+using System.IO;
 
 namespace Omega_Sudoku
 {
@@ -8,16 +10,12 @@ namespace Omega_Sudoku
     {
         public static void Main(string[] args)
         {
+            Menu.ShowIntroduction();
             while (true)
             {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("select your desired input method:");
-                Console.WriteLine("1 - Console");
-                Console.WriteLine("2 - text file");
-                Console.WriteLine("to close, type 'exit'");
-                Console.ResetColor();
                 try
                 {
+                    Menu.ShowMenu();
                     string choice = Console.ReadLine();
                     BasicHelpers.CheckStringValidity(choice);
                     choice = choice.Trim();
@@ -28,10 +26,11 @@ namespace Omega_Sudoku
 
                     UserChoiceHandler.HandleChoice(choice);
                 }
+                
                 catch(Exception e)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Annn error occured: " + e.Message);
+                    Console.WriteLine("An error occured: " + e.Message);
                     Console.ResetColor();
                 }
                 
