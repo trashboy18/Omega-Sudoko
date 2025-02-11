@@ -10,9 +10,9 @@ namespace Omega_Sudoku.Helpers
     {
         public enum Result
         {
-            NoChange,        // No hidden pairs were applied; state remains unchanged.
-            Changed,         // Hidden pairs were applied and state updated successfully.
-            Contradiction    // A contradiction was detected; branch should backtrack.
+            NoChange,        //no hidden pairs were applied; state remains unchanged.
+            Changed,         //Hidden pairs were applied and state updated successfully.
+            Contradiction    //A contradiction was detected; branch should backtrack.
         }
 
     }

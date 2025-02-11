@@ -11,7 +11,6 @@ namespace Omega_Sudoku.Heuristics
     {
         public static bool HeuristicSolving(int[,] board)
         {
-            //apply hidden singles repeatedly.
 
             //apply naked singles repeatedly.
             Result nsResult = NakedSingles.RepeatNakedSingles(board);
