@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Omega_Sudoku.Handlers;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -13,14 +14,11 @@ namespace Omega_Sudoku
         {
             if(choice.Equals("1"))
             {
-                Console.WriteLine("Enter a Sudoku puzzle string (e.g., 81 characters for a 9x9 board):");
-                string puzzleString = Console.ReadLine().Trim();
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
-                BasicHelpers.SolveProcess(puzzleString);
-                sw.Stop();
-                Console.WriteLine($"Sudoku solved in {sw.ElapsedMilliseconds} ms");
-
+                ConsoleChoiceHandler.HandleConsole();
+            }
+            if(choice.Equals("2"))
+            {
+                FileChoiceHandler.HandleFile();
             }
 
         }
