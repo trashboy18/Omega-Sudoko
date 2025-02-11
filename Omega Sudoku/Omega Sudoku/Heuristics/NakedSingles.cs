@@ -53,11 +53,8 @@ namespace Omega_Sudoku.Heuristics
         }
 
         /// <summary>
-        /// Repeatedly applies naked singles until no further changes occur.
-        /// Before processing, it clones the solver state. Then, after processing,
-        /// it checks if any empty cell has zero candidates (i.e. a contradiction).
-        /// If a contradiction is detected, it restores the saved state and returns Contradiction;
-        /// otherwise, returns Changed if any changes were made (or NoChange if none).
+        /// Repeatedly applies naked singles until no further changes occure
+        /// if a contradiction is found, return.
         /// </summary>
         public static Result RepeatNakedSingles(int[,] board)
         {
