@@ -9,13 +9,10 @@ namespace Omega_Sudoku
     {
         public static bool SolveSudoku(int[,] board)
         {
-            //Console.WriteLine("starting hidden singles");
             if (!HeuristicSolver.HeuristicSolving(board))
             {
-              //  Console.WriteLine("oh no! hidden singles didn't work!");
                return false;
             }
-            //Console.WriteLine("finished hidden singles");
             //find the empty cell with the fewest candidates using MRV.
             (int row, int col, HashSet<int> cellCandidates) = LogicHelpers.FindCellWithMRV(board);
 
@@ -34,7 +31,6 @@ namespace Omega_Sudoku
             //for each candidate number for the chosen cell...
             foreach (int num in cellCandidates)
             {
-               // Console.WriteLine($"guessing number: ({row},{col},{num})");
                 //check if placing 'num' is safe.
                 if (!LogicHelpers.IsSafe(row, col, num))
                 {
@@ -64,7 +60,6 @@ namespace Omega_Sudoku
 
                 //if the recursive call failed, backtrack: undo changes and restore state.
 
-                //BasicHelpers.PrintBoard(board);
 
                 LogicHelpers.RestoreState(savedState, board);
             }

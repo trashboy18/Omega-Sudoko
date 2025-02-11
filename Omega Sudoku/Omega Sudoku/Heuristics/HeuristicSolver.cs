@@ -19,7 +19,7 @@ namespace Omega_Sudoku.Heuristics
 
                 return false;
             }
-
+            //apply hidden singles repeatedly.
             Result hsResult = HiddenSingles.RepeatHiddenSingles(board);
 
             if (hsResult == Result.Contradiction)
@@ -27,6 +27,8 @@ namespace Omega_Sudoku.Heuristics
                 //hidden singles produced a contradiction; backtrack.
                 return false;
             }
+
+            //apply naked pairs repeatedly.
             Result npResult = NakedPairs.RepeatNakedPairs(board);
             if(npResult == Result.Contradiction)
             {
