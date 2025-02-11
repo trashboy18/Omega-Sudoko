@@ -36,4 +36,13 @@ namespace Omega_Sudoku.Exceptions
         }
 
     }
+    public class InvalidUserChoice : SudokuException
+    {
+        public InvalidUserChoice(string message)
+            : base(message)
+        {
+            {
+            }
+        }
+    }
 }

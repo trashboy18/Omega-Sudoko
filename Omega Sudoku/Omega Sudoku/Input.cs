@@ -10,11 +10,12 @@ namespace Omega_Sudoku
         {
             while (true)
             {
-
+                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("select your desired input method:");
                 Console.WriteLine("1 - Console");
                 Console.WriteLine("2 - text file");
                 Console.WriteLine("to close, type 'exit'");
+                Console.ResetColor();
                 string choice = Console.ReadLine().Trim();
                 if (choice.Equals("exit"))
                 {
@@ -22,8 +23,6 @@ namespace Omega_Sudoku
                 }
                 
                 UserChoiceHandler.HandleChoice(choice);
-
-                
             }
         }
     }

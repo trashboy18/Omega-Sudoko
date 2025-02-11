@@ -170,16 +170,16 @@ namespace Omega_Sudoku
                StringBuilder output = FinalBoard(board);
                 return output; 
             }
-            catch (SudokuException e)
+            catch (SudokuException es)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                string msg = "An error occurred: " + e.Message;
+                string msg = "An error occurred: " + es.Message;
                 StringBuilder output = new StringBuilder(msg);
                 return output;
             }
-            //catch (Exception e)
+            catch (Exception e)
             {
-                //  Console.WriteLine("Couldn't find the reason for crashing.");
+                 Console.WriteLine("Couldn't find the reason for crashing." + e.Message);
             }
         }
     }

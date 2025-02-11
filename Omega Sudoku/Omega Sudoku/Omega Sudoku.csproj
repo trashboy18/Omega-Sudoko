@@ -59,7 +59,7 @@
     <Compile Include="Helpers\LogicHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Solve.cs" />
-    <Compile Include="UserChoiceHandler.cs" />
+    <Compile Include="Handlers\UserChoiceHandler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
