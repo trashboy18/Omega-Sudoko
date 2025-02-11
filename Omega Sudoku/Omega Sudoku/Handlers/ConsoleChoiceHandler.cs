@@ -15,7 +15,9 @@ namespace Omega_Sudoku.Handlers
             try
             {
                 Console.WriteLine("Enter a Sudoku puzzle string (e.g., 81 characters for a 9x9 board):");
-                string puzzleString = Console.ReadLine().Trim();
+                string puzzleString = Console.ReadLine();
+                BasicHelpers.CheckStringValidity(puzzleString);
+                puzzleString = puzzleString.Trim();
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
                 BasicHelpers.SolveProcess(puzzleString);
@@ -26,6 +28,12 @@ namespace Omega_Sudoku.Handlers
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("an error occured: " + se.Message);
+                Console.ResetColor();
+            }
+            catch(Exception e)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("an error occured: " + e.Message);
                 Console.ResetColor();
             }
         }
