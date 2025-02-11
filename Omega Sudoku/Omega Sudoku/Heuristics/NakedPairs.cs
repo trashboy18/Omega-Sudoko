@@ -12,6 +12,12 @@ namespace Omega_Sudoku.Heuristics
     {
         static int N;
         static int MiniSquare;
+        /// <summary>
+        /// for each row, find 2 cells with the same exact 2 candidates.
+        /// if found, remove those candidates from the other cells,
+        /// since they are'nt relavant there anymore
+        /// </summary>
+        
         public static Result FindNakedPairsInRow(int[,] board)
         {
             Result overallResult = Result.NoChange;
@@ -91,6 +97,10 @@ namespace Omega_Sudoku.Heuristics
             }
             return overallResult;
         }
+
+        /// <summary>
+        /// works the same way as above.
+        /// </summary>
         public static Result FindNakedPairsInCol(int[,] board)
         {
             Result overallResult = Result.NoChange;
@@ -155,7 +165,9 @@ namespace Omega_Sudoku.Heuristics
             }
             return overallResult;
         }
-
+        /// <summary>
+        /// works the same way as above.
+        /// </summary>
         public static Result FindNakedPairsInBox(int[,] board)
         {
             Result overallResult = Result.NoChange;
@@ -230,6 +242,10 @@ namespace Omega_Sudoku.Heuristics
             return overallResult;
         }
 
+        /// <summary>
+        /// tries to find a naked pair in a row/col/box. 
+        /// if there's a contradiction, return.
+        /// </summary>
         public static Result FindNakedPairsAll(int[,] board)
         {
             Result rowResult = FindNakedPairsInRow(board);
@@ -248,6 +264,9 @@ namespace Omega_Sudoku.Heuristics
                 return Result.Changed;
             return Result.NoChange;
         }
+        /// <summary>
+        /// while changes are made becuase of the hidden singles, repeat doing it.
+        /// </summary>
         public static Result RepeatNakedPairs(int[,] board)
         {
             Result result = Result.NoChange;
