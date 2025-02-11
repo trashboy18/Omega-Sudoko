@@ -61,8 +61,10 @@ namespace Omega_Sudoku
         public static void CheckStringValidity(string input)
         {
             if (string.IsNullOrEmpty(input))
-                throw new InvalidCellsAmountException("board cannot be empty.");
-
+            {
+                throw new Exception("input cannot be empty");
+            }
+                            
         }
 
         public static bool ValidateBoardRows(int[,] board)

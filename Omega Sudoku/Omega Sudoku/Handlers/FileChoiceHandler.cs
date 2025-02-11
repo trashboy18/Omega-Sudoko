@@ -14,14 +14,17 @@ namespace Omega_Sudoku.Handlers
         public static void HandleFile()
         {
             Console.WriteLine("Enter the full file path:");
-            string filePath = Console.ReadLine().Trim();
+            string filePath = "";
             try
-            { 
+            {
+                filePath = Console.ReadLine();
+                BasicHelpers.CheckStringValidity(filePath);
+                filePath = filePath.Trim();
                 if (!File.Exists(filePath))
                 {
                     throw new IOException("File not found. Make sure you write the full path " +
                         "correctly, or ensure it is located inside bin/debug.");
-                }
+            }
             
             
                 string puzzleString = File.ReadAllText(filePath).Trim();
@@ -55,6 +58,12 @@ namespace Omega_Sudoku.Handlers
                 Console.WriteLine(ioe.Message);
                 Console.ResetColor();
 
+            }
+            catch(Exception e)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(e.Message);
+                Console.ResetColor();
             }
         }
     }

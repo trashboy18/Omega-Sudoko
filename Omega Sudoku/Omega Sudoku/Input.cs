@@ -16,13 +16,26 @@ namespace Omega_Sudoku
                 Console.WriteLine("2 - text file");
                 Console.WriteLine("to close, type 'exit'");
                 Console.ResetColor();
-                string choice = Console.ReadLine().Trim();
-                if (choice.Equals("exit"))
+                try
                 {
-                    break;
+                    string choice = Console.ReadLine();
+                    BasicHelpers.CheckStringValidity(choice);
+                    choice = choice.Trim();
+                    if (choice.ToLower().Equals("exit"))
+                    {
+                        break;
+                    }
+
+                    UserChoiceHandler.HandleChoice(choice);
+                }
+                catch(Exception e)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Annn error occured: " + e.Message);
+                    Console.ResetColor();
                 }
                 
-                UserChoiceHandler.HandleChoice(choice);
+
             }
         }
     }
