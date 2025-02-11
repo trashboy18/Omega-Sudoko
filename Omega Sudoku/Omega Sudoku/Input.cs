@@ -15,16 +15,15 @@ namespace Omega_Sudoku
                 Console.WriteLine("1 - Console");
                 Console.WriteLine("2 - text file");
                 Console.WriteLine("to close, type 'exit'");
-                string puzzleString = Console.ReadLine().Trim();
-                if (puzzleString.Equals("exit"))
+                string choice = Console.ReadLine().Trim();
+                if (choice.Equals("exit"))
                 {
                     break;
                 }
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
-                BasicHelpers.SolveProccess(puzzleString);
-                sw.Stop();
-                Console.WriteLine($"Sudoku solved in {sw.ElapsedMilliseconds} ms");
+                
+                UserChoiceHandler.HandleChoice(choice);
+
+                
             }
         }
     }
