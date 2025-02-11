@@ -141,7 +141,7 @@ namespace Omega_Sudoku
         }
 
         //calls various function to solve the sudoku.
-        public static void SolveProccess(string input)
+        public static void SolveProcess(string input)
         {
             try
             {
