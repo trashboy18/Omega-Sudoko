@@ -51,7 +51,7 @@ namespace Omega_Sudoku.Tests
             Assert.IsTrue(BasicHelpers.SolveProcess(input).Item2);
         }
 
-        // Tests for solvable 16*16 boards
+        // Tests for solvable 16x16 boards
         [TestMethod]
         public void Test16x16a()
         {
@@ -92,7 +92,7 @@ namespace Omega_Sudoku.Tests
             Assert.IsTrue(BasicHelpers.SolveProcess(input).Item2);
         }
 
-        // Tests for solvable 25*25 boards
+        // Tests for solvable 25x25 boards
         [TestMethod]
         public void Test25x25a()
         {
@@ -108,7 +108,7 @@ namespace Omega_Sudoku.Tests
             //Assert
             Assert.IsTrue(BasicHelpers.SolveProcess(input).Item2);
         }
-
+        //tests for empty boards.
         [TestMethod]
         public void TestEmpty1x1()
         {
