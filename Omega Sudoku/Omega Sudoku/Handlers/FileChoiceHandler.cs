@@ -15,15 +15,15 @@ namespace Omega_Sudoku.Handlers
         {
             Console.WriteLine("Enter the full file path:");
             string filePath = Console.ReadLine().Trim();
-            if (!File.Exists(filePath))
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("File not found. Make sure you write the full path " +
-                    "correctly, or ensure it is located inside bin/debug.");
-                Console.ResetColor();
-            }
             try
-            {
+            { 
+                if (!File.Exists(filePath))
+                {
+                    throw new IOException("File not found. Make sure you write the full path " +
+                        "correctly, or ensure it is located inside bin/debug.");
+                }
+            
+            
                 string puzzleString = File.ReadAllText(filePath).Trim();
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine("An appropriate output is now inside the input file.");
@@ -49,7 +49,13 @@ namespace Omega_Sudoku.Handlers
                 Console.ResetColor();
 
             }
+            catch(IOException ioe)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ioe.Message);
+                Console.ResetColor();
 
+            }
         }
     }
 }
