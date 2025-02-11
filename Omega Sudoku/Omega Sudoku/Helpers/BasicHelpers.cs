@@ -62,9 +62,9 @@ namespace Omega_Sudoku
         {
             if (string.IsNullOrEmpty(input))
             {
-                throw new Exception("input cannot be empty");
+                throw new Exception("You can't do that!");
             }
-                            
+
         }
 
         public static bool ValidateBoardRows(int[,] board)
@@ -178,6 +178,7 @@ namespace Omega_Sudoku
                 throw new SudokuException(es.Message);
                 
             }
+            
             
         }
     }

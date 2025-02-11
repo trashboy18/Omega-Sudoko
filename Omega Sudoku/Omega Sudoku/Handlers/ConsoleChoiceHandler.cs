@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,6 +31,7 @@ namespace Omega_Sudoku.Handlers
                 Console.WriteLine("an error occured: " + se.Message);
                 Console.ResetColor();
             }
+            
             catch(Exception e)
             {
                 Console.ForegroundColor = ConsoleColor.Red;

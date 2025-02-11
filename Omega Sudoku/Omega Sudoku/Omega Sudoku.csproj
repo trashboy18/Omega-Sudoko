@@ -55,11 +55,12 @@
     <Compile Include="Heuristics\HiddenSingles.cs" />
     <Compile Include="Heuristics\NakedPairs.cs" />
     <Compile Include="Heuristics\NakedSingles.cs" />
-    <Compile Include="Input.cs" />
+    <Compile Include="UI\Input.cs" />
     <Compile Include="Helpers\LogicHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Solve.cs" />
     <Compile Include="Handlers\UserChoiceHandler.cs" />
+    <Compile Include="UI\Menu.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
