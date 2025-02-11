@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Omega_Sudoku.Exceptions;
 
 namespace Omega_Sudoku
 {
@@ -16,9 +17,15 @@ namespace Omega_Sudoku
             {
                 ConsoleChoiceHandler.HandleConsole();
             }
-            if(choice.Equals("2"))
+            else if(choice.Equals("2"))
             {
                 FileChoiceHandler.HandleFile();
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("you didn't choose a valid option. try again!");
+                Console.ResetColor();
             }
 
         }
