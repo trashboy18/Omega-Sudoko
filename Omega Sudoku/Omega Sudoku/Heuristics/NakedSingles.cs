@@ -62,9 +62,11 @@ namespace Omega_Sudoku.Heuristics
         public static Result RepeatNakedSingles(int[,] board)
         {
             N = Globals.N;
+            int count = 0;
             Result res;
             do
             {
+                count++;
                 res = FindNakedSingles(board);
                 
             } while (res == Result.Changed);
@@ -72,7 +74,8 @@ namespace Omega_Sudoku.Heuristics
             {
                 return Result.Contradiction;
             }
-            
+            if (count > 1)
+                return Result.Changed;
             return Result.NoChange;
         }
     }

@@ -51,6 +51,7 @@
     <Compile Include="Heuristics\HeuristicSolver.cs" />
     <Compile Include="Heuristics\HiddenPairs.cs" />
     <Compile Include="Heuristics\HiddenSingles.cs" />
+    <Compile Include="Heuristics\NakedPairs.cs" />
     <Compile Include="Heuristics\NakedSingles.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="Helpers\LogicHelpers.cs" />
