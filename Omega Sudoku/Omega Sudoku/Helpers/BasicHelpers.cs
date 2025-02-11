@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace Omega_Sudoku
 {
@@ -18,6 +19,9 @@ namespace Omega_Sudoku
             int boxSize = Globals.MiniSquare; // Typically 3 for a 9x9 Sudoku
 
             StringBuilder output = new StringBuilder();
+            string beggining = $"Sudoku solved! Here is the {Globals.N}×{Globals.N} solution:\n";
+
+            output.AppendLine(beggining);
             string boardPrint = GetFormattedBoard(board);
             string boardStr = Conversions.BoardToString(board);
             output.AppendLine(boardPrint);
@@ -33,9 +37,7 @@ namespace Omega_Sudoku
             int N = Globals.N;
             int mini = Globals.MiniSquare;
             StringBuilder sb = new StringBuilder();
-            string beggining = $"Sudoku solved! Here is the {Globals.N}×{Globals.N} solution:\n";
-
-            sb.AppendLine(beggining);
+            
             for (int r = 0; r < N; r++)
             {
                 if (r > 0 && r % mini == 0)
@@ -149,7 +151,7 @@ namespace Omega_Sudoku
         }
 
         //calls various function to solve the sudoku.
-        public static StringBuilder SolveProcess(string input)
+        public static (StringBuilder,bool) SolveProcess(string input)
         {
             try
             {
@@ -167,11 +169,12 @@ namespace Omega_Sudoku
                 if (!solved)
                 {
                     //sudoku not solveable. 
+                    
                     throw new UnsolveableSudokuException("This Sudoku puzzle is unsolvable!");
                 }
                 //sudoku solved!
                 StringBuilder output = FinalBoard(board);
-                return output;
+                return (output,true);
             }
             catch (SudokuException es)
             {
