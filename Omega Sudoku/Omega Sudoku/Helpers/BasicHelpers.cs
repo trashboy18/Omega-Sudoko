@@ -12,8 +12,11 @@ namespace Omega_Sudoku
     internal class BasicHelpers
     {
 
-
-        //print sudoku board.
+    /// <summary>
+    /// im building a string that contains the 
+    /// whole board, as well as the board as a string, 
+    /// so i can transfer it easily to a file
+    /// </summary>
         public static StringBuilder FinalBoard(int[,] board)
         {
             int boxSize = Globals.MiniSquare; // Typically 3 for a 9x9 Sudoku
@@ -32,6 +35,10 @@ namespace Omega_Sudoku
             return output;
         }
 
+        /// <summary>
+        ///builds the board itself.
+        /// </summary>
+        
         public static string GetFormattedBoard(int[,] board)
         {
             int N = Globals.N;
@@ -59,7 +66,9 @@ namespace Omega_Sudoku
             return sb.ToString();
         }
         
-        //check if the input represents a sudoku board
+        /// <summary>
+        /// check if the input represents a sudoku board
+        /// </summary
         public static void CheckStringValidity(string input)
         {
             if (string.IsNullOrEmpty(input))
@@ -68,7 +77,9 @@ namespace Omega_Sudoku
             }
 
         }
-
+        /// <summary>
+        /// check if the starting board is valid row-wise 
+        /// </summary>
         public static bool ValidateBoardRows(int[,] board)
         {
             for (int row = 0; row < Globals.N; row++)
@@ -91,7 +102,9 @@ namespace Omega_Sudoku
             }
             return true;
         }
-        
+        /// <summary>
+        /// check if the starting board is valid col-wise 
+        /// </summary>
         public static bool ValidateBoardCols(int[,] board)
         {
             for (int col = 0; col < Globals.N; col++)
@@ -113,6 +126,9 @@ namespace Omega_Sudoku
             }
             return true;
         }
+        /// <summary>
+        /// check if the starting board is valid box-wise 
+        /// </summary>
         public static bool ValidateBoardBoxes(int[,] board)
         {
             int MiniSquare = Globals.MiniSquare;
@@ -141,6 +157,10 @@ namespace Omega_Sudoku
             }
             return true;
         }
+        /// <summary>
+        /// general function to check if the initial board is legal.
+        /// </summary>
+        
         public static void ValidateInitialBoard(int[,] board)
         {
             if (!ValidateBoardRows(board) || !ValidateBoardCols(board)
@@ -155,7 +175,7 @@ namespace Omega_Sudoku
         {
             try
             {
-
+                //check if the string is valid.
                 CheckStringValidity(input);
 
                 //convert the board to a materix.
