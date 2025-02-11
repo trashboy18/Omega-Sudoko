@@ -227,17 +227,7 @@ namespace Omega_Sudoku
             return true;
         }
 
-        // undo forward-check changes
-        public static void UndoForwardCheck(List<(int nr, int nc, int removed)> removedCandidates)
-        {
-            foreach (var (nr, nc, remDigit) in removedCandidates)
-            {
-                Globals.candidates[nr, nc].Add(remDigit);
-            }
-            removedCandidates.Clear();
-        }
-
-
+        
 
         public static int[,] CloneBoard(int[,] board)
         {
