@@ -10,7 +10,7 @@ namespace Omega_Sudoku
     {
         static int N;
         static int MiniSquare;
-        private static int DeduceBoardSize(int length)
+        public static int DeduceBoardSize(int length)
         {
             //check if length is a perfect square: length = N*N.
             Globals.N = (int)Math.Round(Math.Sqrt(length));

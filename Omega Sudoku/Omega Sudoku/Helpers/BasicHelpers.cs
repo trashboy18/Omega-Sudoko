@@ -89,6 +89,7 @@ namespace Omega_Sudoku
             }
             return true;
         }
+        
         public static bool ValidateBoardCols(int[,] board)
         {
             for (int col = 0; col < Globals.N; col++)
@@ -143,7 +144,7 @@ namespace Omega_Sudoku
             if (!ValidateBoardRows(board) || !ValidateBoardCols(board)
                 || !ValidateBoardBoxes(board))
             {
-                throw new UnsolveableSudokuException("This Sudoku puzzle is unsolvable!");
+                throw new InvalidBoard("This Sudoku board is impossible!");
             }
         }
 
@@ -169,17 +170,20 @@ namespace Omega_Sudoku
                     throw new UnsolveableSudokuException("This Sudoku puzzle is unsolvable!");
                 }
                 //sudoku solved!
-               StringBuilder output = FinalBoard(board);
-                return output; 
+                StringBuilder output = FinalBoard(board);
+                return output;
             }
             catch (SudokuException es)
             {
-                
+
                 throw new SudokuException(es.Message);
-                
+
             }
-            
-            
+            catch (Exception e)
+            {
+                throw new SudokuException(e.Message);
+
+            }
         }
     }
 }
