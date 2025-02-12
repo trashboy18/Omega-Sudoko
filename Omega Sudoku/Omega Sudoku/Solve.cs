@@ -4,7 +4,6 @@ using Omega_Sudoku.Utils;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using static Omega_Sudoku.Helpers.Enum;
 
 namespace Omega_Sudoku
 {

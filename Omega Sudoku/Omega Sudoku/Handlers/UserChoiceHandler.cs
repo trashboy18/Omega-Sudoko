@@ -1,10 +1,4 @@
 ﻿using Omega_Sudoku.Handlers;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Omega_Sudoku.Exceptions;
 
 namespace Omega_Sudoku
