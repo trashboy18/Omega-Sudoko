@@ -69,7 +69,7 @@ namespace Omega_Sudoku
                 LogicHelpers.RestoreState(savedState, board);
             }
 
-            //if no candidate worked, the board is unsolvable.
+            //if no candidate worked, the board is unsolvable!
             return false;
         }
     }
