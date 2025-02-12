@@ -16,7 +16,7 @@ namespace Omega_Sudoku
         public static int N;
         public static int MiniSquare;
 
-        
+
 
         //called once from BasicHelpers.SolveProcess, after parsing the board
         public static void InitializeCells(int[,] board)
@@ -80,7 +80,7 @@ namespace Omega_Sudoku
         }
 
         //helper to map row,col -> box index
-        private static int BoxIndex(int r, int c)
+        public static int BoxIndex(int r, int c)
         {
             int boxRow = r / MiniSquare;
             int boxCol = c / MiniSquare;
@@ -139,158 +139,5 @@ namespace Omega_Sudoku
             return (bestRow, bestCol, new HashSet<int>(bestCandidates));
         }
 
-        //puts digit in board[row,col], updates usage arrays
-        public static void PlaceNum(int[,] board, int row, int col, int num)
-        {
-            board[row, col] = num;
-            Globals.rowUsed[row, num] = true;
-            Globals.colUsed[col, num] = true;
-            Globals.boxUsed[BoxIndex(row, col), num] = true;
-            Globals.candidates[row, col].Clear();
-        }
-
-        // Removes digit from board, usage arrays
-        public static void RemoveNum(int[,] board, int row, int col, int num)
-        {
-            board[row, col] = 0;
-            Globals.rowUsed[row, num] = false;
-            Globals.colUsed[col, num] = false;
-            Globals.boxUsed[BoxIndex(row, col), num] = false;
-        }
-
-        //removes digit from empty neighbors' candidate sets, ignoring filled neighbors
-        //if removing digit from a neighbor's set, then set count hits 0,
-        //then contradiction, so return false
-        public static bool ForwardCheck(int[,] board, int row, int col, int num)
-        {
-            // row
-            if (!RemoveCandidatesFromRow(board, row, col, num))
-                return false;
-
-            // col
-            if (!RemoveCandidatesFromCol(board, row, col, num))
-                return false;
-
-            // box
-
-            if (!RemoveCandidatesFromBox(board, row, col, num))
-                return false;
-
-            return true;
-        }
-        public static bool RemoveCandidatesFromRow(int[,] board, int row, int col, int num)
-        {
-            for (int cc = 0; cc < N; cc++)
-            {
-                if (cc != col && board[row, cc] == 0)   
-                {
-                    if (Globals.candidates[row, cc].Remove(num))
-                    {
-                        if (Globals.candidates[row, cc].Count == 0) return false;
-                    }
-                }
-            }
-            return true;
-
-        }
-        public static bool RemoveCandidatesFromCol(int[,] board, int row, int col, int num)
-        {
-            for (int rr = 0; rr < N; rr++)
-            {
-                if (rr != row && board[rr, col] == 0)
-                {
-                    if (Globals.candidates[rr, col].Remove(num))
-                    {
-                        if (Globals.candidates[rr, col].Count == 0) return false;
-                    }
-                }
-            }
-            return true;
-        }
-        public static bool RemoveCandidatesFromBox(int[,] board, int row, int col, int num)
-        {
-            int boxIndex = BoxIndex(row, col);
-            int startRow = (boxIndex / MiniSquare) * MiniSquare;
-            int startCol = (boxIndex % MiniSquare) * MiniSquare;
-            for (int rr = 0; rr < MiniSquare; rr++)
-            {
-                for (int cc = 0; cc < MiniSquare; cc++)
-                {
-                    int nr = startRow + rr;
-                    int nc = startCol + cc;
-                    if ((nr != row || nc != col) && board[nr, nc] == 0)
-                    {
-                        if (Globals.candidates[nr, nc].Remove(num))
-                        {
-                            if (Globals.candidates[nr, nc].Count == 0) return false;
-                        }
-                    }
-                }
-            }
-            return true;
-        }
-
-        
-
-        public static int[,] CloneBoard(int[,] board)
-        {
-            //clone board
-            
-            int[,] boardClone = new int[N,N];
-            for(int row = 0; row < N;row++)
-                for (int col = 0; col < N;col++)
-                    boardClone[row,col] = board[row,col];
-            return boardClone;
-        }
-        public static HashSet<int>[,] CloneCandidates()
-        {
-            HashSet<int>[,] candidatesClone = new HashSet<int>[N, N];
-            for (int i = 0; i < N; i++)
-                for (int j = 0; j < N; j++)
-                    candidatesClone[i, j] = new HashSet<int>(Globals.candidates[i, j]);
-            return candidatesClone;
-        }
-
-        //clone the complete solver state (board, usage arrays, and candidate sets)
-        public static (int[,] boardClone, bool[,] rowUsedClone, bool[,] colUsedClone,
-            bool[,] boxUsedClone, HashSet<int>[,] candidatesClone)
-            CloneState(int[,] board)
-        {
-            
-
-            int[,] boardClone = CloneBoard(board);
-            //clone usage arrays
-            bool[,] rowUsedClone = (bool[,])Globals.rowUsed.Clone();
-            bool[,] colUsedClone = (bool[,])Globals.colUsed.Clone();
-            bool[,] boxUsedClone = (bool[,])Globals.boxUsed.Clone();
-
-            //clone candidate sets: create new HashSet for each cell
-
-            HashSet<int>[,] candidatesClone = CloneCandidates();
-
-
-            return (boardClone, rowUsedClone, colUsedClone, boxUsedClone, candidatesClone);
-        }
-
-        //restore the solver state from a previously cloned state
-        public static void RestoreState(
-            (int[,] boardClone, bool[,] rowUsedClone, bool[,] colUsedClone,
-            bool[,] boxUsedClone, HashSet<int>[,] candidatesClone) state,
-            int[,] board)
-        {
-            //copy back the board values
-            int rows = board.GetLength(0);
-            int cols = board.GetLength(1);
-            for(int row = 0; row < rows; row++) 
-                for(int col = 0; col < cols;col++)
-                {
-                    board[row,col] = state.boardClone[row,col];
-                }
-            //restore the static global state
-            Globals.rowUsed = state.rowUsedClone;
-            Globals.colUsed = state.colUsedClone;
-            Globals.boxUsed = state.boxUsedClone;
-            Globals.candidates = state.candidatesClone;
-        }
-    }
+    }       
 }

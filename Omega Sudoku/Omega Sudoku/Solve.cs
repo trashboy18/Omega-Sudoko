@@ -1,4 +1,5 @@
 ﻿using Omega_Sudoku.Heuristics;
+using Omega_Sudoku.Utils;
 using System;
 using System.Collections.Generic;
 using static Omega_Sudoku.Helpers.Enum;
@@ -43,17 +44,17 @@ namespace Omega_Sudoku
                 }
 
                 //clone the current state before guessing.
-                 var savedState = LogicHelpers.CloneState(board);
+                 var savedState = CloneBoardUtils.CloneState(board);
 
                 //place the candidate number on the clone.
-                LogicHelpers.PlaceNum(board, row, col, num);
+                ChangeBoardUtils.PlaceNum(board, row, col, num);
                 //BasicHelpers.PrintBoard(board);
 
                 //apply forward checking on the clone.
-                if (!LogicHelpers.ForwardCheck(board, row, col, num))
+                if (!ChangeBoardUtils.ForwardCheck(board, row, col, num))
                 {                    
                     //BasicHelpers.PrintBoard(board);
-                    LogicHelpers.RestoreState(savedState, board);
+                    CloneBoardUtils.RestoreState(savedState, board);
                     continue;
                 }
 
@@ -66,7 +67,7 @@ namespace Omega_Sudoku
                 //if the recursive call failed, backtrack: undo changes and restore state.
 
 
-                LogicHelpers.RestoreState(savedState, board);
+                CloneBoardUtils.RestoreState(savedState, board);
             }
 
             //if no candidate worked, the board is unsolvable!
