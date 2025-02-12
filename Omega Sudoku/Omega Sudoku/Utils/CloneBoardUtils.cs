@@ -23,9 +23,9 @@ namespace Omega_Sudoku.Utils
         {
             int N = Globals.N;
             HashSet<int>[,] candidatesClone = new HashSet<int>[N, N];
-            for (int i = 0; i < N; i++)
-                for (int j = 0; j < N; j++)
-                    candidatesClone[i, j] = new HashSet<int>(Globals.candidates[i, j]);
+            for (int row = 0; row < N; row++)
+                for (int col = 0; col < N; col++)
+                    candidatesClone[row, col] = new HashSet<int>(Globals.candidates[row, col]);
             return candidatesClone;
         }
 

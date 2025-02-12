@@ -1,7 +1,9 @@
-﻿using Omega_Sudoku.Heuristics;
+﻿using Omega_Sudoku.Exceptions;
+using Omega_Sudoku.Heuristics;
 using Omega_Sudoku.Utils;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using static Omega_Sudoku.Helpers.Enum;
 
 namespace Omega_Sudoku
@@ -72,6 +74,44 @@ namespace Omega_Sudoku
 
             //if no candidate worked, the board is unsolvable!
             return false;
+        }
+        //calls various function to solve the sudoku.
+        public static (StringBuilder, bool) SolveProcess(string input)
+        {
+            try
+            {
+                //check if the string is valid.
+                BasicHelpers.CheckStringValidity(input);
+
+                //convert the board to a materix.
+                int[,] board = Conversions.StringToBoard(input);
+                BasicHelpers.ValidateInitialBoard(board);
+
+                //initialize the cells.(candidates, etc...)
+                LogicHelpers.InitializeCells(board);
+                //check if the initial board is invalid.(for example: '1' appears in a row twice.
+                bool solved = Solve.SolveSudoku(board);
+                if (!solved)
+                {
+                    //sudoku not solveable. 
+
+                    throw new UnsolveableSudokuException("This Sudoku puzzle is unsolvable!");
+                }
+                //sudoku solved!
+                StringBuilder output = BasicHelpers.FinalBoard(board);
+                return (output, true);
+            }
+            catch (SudokuException es)
+            {
+
+                throw new SudokuException(es.Message);
+
+            }
+            catch (Exception e)
+            {
+                throw new SudokuException(e.Message);
+
+            }
         }
     }
 }

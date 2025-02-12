@@ -35,7 +35,7 @@ namespace Omega_Sudoku.Handlers
                 Console.ResetColor();
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
-                StringBuilder solvedBoard = BasicHelpers.SolveProcess(puzzleString).Item1;
+                StringBuilder solvedBoard = Solve.SolveProcess(puzzleString).Item1;
                 sw.Stop();
                 Console.WriteLine("An appropriate output is now inside the input file.");
 

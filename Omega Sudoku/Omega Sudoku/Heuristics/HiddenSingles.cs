@@ -187,17 +187,17 @@ namespace Omega_Sudoku
                     if (keyValuePairs[num] == 1)
                     {
                         bool placed = false;
-                        for (int r = startRow; r < startRow + MiniSquare && !placed; r++)
+                        for (int row = startRow; row < startRow + MiniSquare && !placed; row++)
                         {
-                            for (int c = startCol; c < startCol + MiniSquare && !placed; c++)
+                            for (int col = startCol; col < startCol + MiniSquare && !placed; col++)
                             {
-                                if (board[r, c] == 0 && Globals.candidates[r, c].Contains(num))
+                                if (board[row, col] == 0 && Globals.candidates[row, col].Contains(num))
                                 {
 
-                                    if (LogicHelpers.IsSafe(r, c, num))
+                                    if (LogicHelpers.IsSafe(row, col, num))
                                     {
-                                        ChangeBoardUtils.PlaceNum(board, r, c, num);
-                                        if (!ChangeBoardUtils.ForwardCheck(board, r, c, num))
+                                        ChangeBoardUtils.PlaceNum(board, row, col, num);
+                                        if (!ChangeBoardUtils.ForwardCheck(board, row, col, num))
                                         {
 
                                             return Result.Contradiction;

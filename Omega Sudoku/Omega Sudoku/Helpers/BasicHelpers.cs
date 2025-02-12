@@ -48,19 +48,19 @@ namespace Omega_Sudoku
             int mini = Globals.MiniSquare;
             StringBuilder sb = new StringBuilder();
             
-            for (int r = 0; r < N; r++)
+            for (int row = 0; row < N; row++)
             {
-                if (r > 0 && r % mini == 0)
+                if (row > 0 && row % mini == 0)
                 {
                     for (int i = 0; i < N * 2 + mini - 1; i++)
                         sb.Append("-");
                     sb.AppendLine();
                 }
-                for (int c = 0; c < N; c++)
+                for (int col = 0; col < N; col++)
                 {
-                    if (c > 0 && c % mini == 0)
+                    if (col > 0 && col % mini == 0)
                         sb.Append("| ");
-                    int num = board[r, c];
+                    int num = board[row, col];
                     char cell = num == 0 ? '0' : (char)('0'+num);
                     sb.Append(cell + " ");
                 }
@@ -140,11 +140,11 @@ namespace Omega_Sudoku
                 for (int boxCol = 0; boxCol < MiniSquare; boxCol++)
                 {
                     bool[] seen = new bool[Globals.N + 1];
-                    for (int r = boxRow * MiniSquare; r < boxRow * MiniSquare + MiniSquare; r++)
+                    for (int row = boxRow * MiniSquare; row < boxRow * MiniSquare + MiniSquare; row++)
                     {
-                        for (int c = boxCol * MiniSquare; c < boxCol * MiniSquare + MiniSquare; c++)
+                        for (int col = boxCol * MiniSquare; col < boxCol * MiniSquare + MiniSquare; col++)
                         {
-                            int num = board[r, c];
+                            int num = board[row, col];
                             if (num != 0)
                             {
                                 if (seen[num])
@@ -173,43 +173,6 @@ namespace Omega_Sudoku
             }
         }
 
-        //calls various function to solve the sudoku.
-        public static (StringBuilder,bool) SolveProcess(string input)
-        {
-            try
-            {
-                //check if the string is valid.
-                CheckStringValidity(input);
-
-                //convert the board to a materix.
-                int[,] board = Conversions.StringToBoard(input);
-                ValidateInitialBoard(board);
-
-                //initialize the cells.(candidates, etc...)
-                LogicHelpers.InitializeCells(board);
-                //check if the initial board is invalid.(for example: '1' appears in a row twice.
-                bool solved = Solve.SolveSudoku(board);
-                if (!solved)
-                {
-                    //sudoku not solveable. 
-                    
-                    throw new UnsolveableSudokuException("This Sudoku puzzle is unsolvable!");
-                }
-                //sudoku solved!
-                StringBuilder output = FinalBoard(board);
-                return (output,true);
-            }
-            catch (SudokuException es)
-            {
-
-                throw new SudokuException(es.Message);
-
-            }
-            catch (Exception e)
-            {
-                throw new SudokuException(e.Message);
-
-            }
-        }
+        
     }
 }

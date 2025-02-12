@@ -19,7 +19,7 @@ namespace Omega_Sudoku.Tests
             Exception ex = null;
             try
             {
-                BasicHelpers.SolveProcess(input);
+                Solve.SolveProcess(input);
             }
             catch (Exception e)
             {
@@ -37,7 +37,7 @@ namespace Omega_Sudoku.Tests
             Exception ex = null;
             try
             {
-                BasicHelpers.SolveProcess(input);
+                Solve.SolveProcess(input);
             }
             catch (Exception e)
             {
@@ -56,7 +56,7 @@ namespace Omega_Sudoku.Tests
             Exception ex = null;
             try
             {
-                BasicHelpers.SolveProcess(input);
+                Solve.SolveProcess(input);
             }
             catch (Exception e)
             {
@@ -76,7 +76,7 @@ namespace Omega_Sudoku.Tests
             Exception ex = null;
             try
             {
-                StringBuilder cs = BasicHelpers.SolveProcess(input).Item1;
+                StringBuilder cs = Solve.SolveProcess(input).Item1;
             }
             catch (Exception e)
             {
