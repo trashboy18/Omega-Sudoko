@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Omega_Sudoku.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -54,8 +55,8 @@ namespace Omega_Sudoku
 
                                 if (LogicHelpers.IsSafe(row, col, num))
                                 {
-                                    LogicHelpers.PlaceNum(board, row, col, num);
-                                    if (!LogicHelpers.ForwardCheck(board, row, col, num))
+                                    ChangeBoardUtils.PlaceNum(board, row, col, num);
+                                    if (!ChangeBoardUtils.ForwardCheck(board, row, col, num))
                                     {
                                         // Forward check failure: contradiction found.
 
@@ -123,9 +124,9 @@ namespace Omega_Sudoku
 
                                 if (LogicHelpers.IsSafe(row, col, num))
                                 {
-                                    LogicHelpers.PlaceNum(board, row, col, num);
+                                    ChangeBoardUtils.PlaceNum(board, row, col, num);
                                     var removed = new List<(int nr, int nc, int removed)>();
-                                    if (!LogicHelpers.ForwardCheck(board, row, col, num))
+                                    if (!ChangeBoardUtils.ForwardCheck(board, row, col, num))
                                     {
 
                                         return Result.Contradiction;
@@ -195,8 +196,8 @@ namespace Omega_Sudoku
 
                                     if (LogicHelpers.IsSafe(r, c, num))
                                     {
-                                        LogicHelpers.PlaceNum(board, r, c, num);
-                                        if (!LogicHelpers.ForwardCheck(board, r, c, num))
+                                        ChangeBoardUtils.PlaceNum(board, r, c, num);
+                                        if (!ChangeBoardUtils.ForwardCheck(board, r, c, num))
                                         {
 
                                             return Result.Contradiction;
