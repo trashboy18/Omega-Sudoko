@@ -260,8 +260,7 @@ namespace Omega_Sudoku
 
         /// <summary>
         /// Repeatedly applies hidden pairs until no further changes occur.
-        /// Before processing, clones the state; if a contradiction is detected after processing,
-        /// restores the state and returns Contradiction; otherwise returns Changed if any change was made, or NoChange.
+        /// If a contradiction is found, return.
         /// </summary>
         public static Result RepeatHiddenPairs(int[,] board)
         {

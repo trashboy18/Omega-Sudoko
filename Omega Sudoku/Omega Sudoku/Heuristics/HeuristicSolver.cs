@@ -7,6 +7,9 @@ using static Omega_Sudoku.Helpers.Enum;
 
 namespace Omega_Sudoku.Heuristics
 {
+    /// <summary>
+    /// heuristics controller. runs them one by one and repeats
+    /// </summary>
     internal class HeuristicSolver
     {
         public static bool HeuristicSolving(int[,] board)

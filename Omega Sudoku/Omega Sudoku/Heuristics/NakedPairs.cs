@@ -287,3 +287,4 @@ namespace Omega_Sudoku.Heuristics
         }
     }
 }
+ 
