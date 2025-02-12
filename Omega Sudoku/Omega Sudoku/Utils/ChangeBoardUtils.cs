@@ -53,13 +53,13 @@ namespace Omega_Sudoku.Utils
         public static bool RemoveCandidatesFromRow(int[,] board, int row, int col, int num)
         {
             int N = Globals.N;
-            for (int cc = 0; cc < N; cc++)
+            for (int relativeCol = 0; relativeCol < N; relativeCol++)
             {
-                if (cc != col && board[row, cc] == 0)
+                if (relativeCol != col && board[row, relativeCol] == 0)
                 {
-                    if (Globals.candidates[row, cc].Remove(num))
+                    if (Globals.candidates[row, relativeCol].Remove(num))
                     {
-                        if (Globals.candidates[row, cc].Count == 0) return false;
+                        if (Globals.candidates[row, relativeCol].Count == 0) return false;
                     }
                 }
             }
@@ -70,13 +70,13 @@ namespace Omega_Sudoku.Utils
         public static bool RemoveCandidatesFromCol(int[,] board, int row, int col, int num)
         {
             int N = Globals.N;
-            for (int rr = 0; rr < N; rr++)
+            for (int relativeRow = 0; relativeRow < N; relativeRow++)
             {
-                if (rr != row && board[rr, col] == 0)
+                if (relativeRow != row && board[relativeRow, col] == 0)
                 {
-                    if (Globals.candidates[rr, col].Remove(num))
+                    if (Globals.candidates[relativeRow, col].Remove(num))
                     {
-                        if (Globals.candidates[rr, col].Count == 0) return false;
+                        if (Globals.candidates[relativeRow, col].Count == 0) return false;
                     }
                 }
             }
@@ -89,12 +89,12 @@ namespace Omega_Sudoku.Utils
             int boxIndex = LogicHelpers.BoxIndex(row, col);
             int startRow = (boxIndex / MiniSquare) * MiniSquare;
             int startCol = (boxIndex % MiniSquare) * MiniSquare;
-            for (int rr = 0; rr < MiniSquare; rr++)
+            for (int relativeRow = 0; relativeRow < MiniSquare; relativeRow++)
             {
-                for (int cc = 0; cc < MiniSquare; cc++)
+                for (int relativecol = 0; relativecol < MiniSquare; relativecol++)
                 {
-                    int nr = startRow + rr;
-                    int nc = startCol + cc;
+                    int nr = startRow + relativeRow;
+                    int nc = startCol + relativecol;
                     if ((nr != row || nc != col) && board[nr, nc] == 0)
                     {
                         if (Globals.candidates[nr, nc].Remove(num))

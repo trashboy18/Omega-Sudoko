@@ -73,10 +73,7 @@ namespace Omega_Sudoku
         public static string BoardToString(int[,] board)
         {
             int N = Globals.N;
-            if (N != board.GetLength(1))
-            {
-                throw new InvalidCellsAmountException($"Board must be NxN. Found {N}x{board.GetLength(1)}.");
-            }
+            
 
             StringBuilder sb = new StringBuilder();
             string beginning = "Here is the solved board as a string:";

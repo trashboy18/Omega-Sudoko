@@ -35,43 +35,43 @@ namespace Omega_Sudoku
 
             //create the candidate sets for each cell
             Globals.candidates = new HashSet<int>[N, N];
-            for (int r = 0; r < N; r++)
+            for (int row = 0; row < N; row++)
             {
-                for (int c = 0; c < N; c++)
+                for (int col = 0; col < N; col++)
                 {
-                    Globals.candidates[r, c] = new HashSet<int>();
+                    Globals.candidates[row, col] = new HashSet<int>();
                 }
             }
 
             //fill usage arrays from the board, and build candidates for empty cells
-            for (int r = 0; r < N; r++)
+            for (int row = 0; row < N; row++)
             {
-                for (int c = 0; c < N; c++)
+                for (int col = 0; col < N; col++)
                 {
-                    int num = board[r, c];
+                    int num = board[row, col];
                     if (num != 0)
                     {
                         // Mark usage
-                        Globals.rowUsed[r, num] = true;
-                        Globals.colUsed[c, num] = true;
-                        Globals.boxUsed[BoxIndex(r, c), num] = true;
+                        Globals.rowUsed[row, num] = true;
+                        Globals.colUsed[col, num] = true;
+                        Globals.boxUsed[BoxIndex(row, col), num] = true;
                     }
                 }
             }
 
             //for each empty cell, build its candidate set
-            for (int r = 0; r < N; r++)
+            for (int row = 0; row < N; row++)
             {
-                for (int c = 0; c < N; c++)
+                for (int col = 0; col < N; col++)
                 {
-                    if (board[r, c] == 0)
+                    if (board[row, col] == 0)
                     {
                         // digits in [1..N]
                         for (int d = 1; d <= N; d++)
                         {
-                            if (IsSafe(r, c, d))
+                            if (IsSafe(row, col, d))
                             {
-                                Globals.candidates[r, c].Add(d);
+                                Globals.candidates[row, col].Add(d);
                             }
                         }
                     }
@@ -80,10 +80,10 @@ namespace Omega_Sudoku
         }
 
         //helper to map row,col -> box index
-        public static int BoxIndex(int r, int c)
+        public static int BoxIndex(int row, int col)
         {
-            int boxRow = r / MiniSquare;
-            int boxCol = c / MiniSquare;
+            int boxRow = row / MiniSquare;
+            int boxCol = col / MiniSquare;
             return boxRow * MiniSquare + boxCol;
         }
 
@@ -91,10 +91,10 @@ namespace Omega_Sudoku
         //check using rowUsed, colUsed, boxUsed
         public static bool IsSafe(int row, int col, int num)
         {
-            int b = BoxIndex(row, col);
+            int boxIndex = BoxIndex(row, col);
             if (Globals.rowUsed[row, num]) return false;
             if (Globals.colUsed[col, num]) return false;
-            if (Globals.boxUsed[b, num]) return false;
+            if (Globals.boxUsed[boxIndex, num]) return false;
             return true;
         }
         //finds the empty cell with the fewest candidates, returns (-1,-1, empty) if solved
@@ -105,19 +105,19 @@ namespace Omega_Sudoku
             int bestCount = int.MaxValue;
             HashSet<int> bestCandidates = new HashSet<int>();
 
-            for (int r = 0; r < N; r++)
+            for (int row = 0; row < N; row++)
             {
-                for (int c = 0; c < N; c++)
+                for (int col = 0; col < N; col++)
                 {
-                    if (board[r, c] == 0)
+                    if (board[row, col] == 0)
                     {
-                        int count = Globals.candidates[r, c].Count;
+                        int count = Globals.candidates[row, col].Count;
                         if (count < bestCount)
                         {
                             bestCount = count;
-                            bestRow = r;
-                            bestCol = c;
-                            bestCandidates = Globals.candidates[r, c];
+                            bestRow = row;
+                            bestCol = col;
+                            bestCandidates = Globals.candidates[row, col];
 
                             if (bestCount == 0)
                             {

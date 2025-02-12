@@ -29,7 +29,7 @@ namespace Omega_Sudoku.Handlers
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
                 //solve
-                BasicHelpers.SolveProcess(puzzleString);
+                Solve.SolveProcess(puzzleString);
                 sw.Stop();
                 Console.WriteLine($"Sudoku solved in {sw.ElapsedMilliseconds} ms");
             }

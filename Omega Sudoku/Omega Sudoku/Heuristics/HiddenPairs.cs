@@ -166,13 +166,13 @@ namespace Omega_Sudoku
                     keyValuePairs[num] = new List<(int, int)>();
 
                     // Iterate over every cell in the box.
-                    for (int r = startRow; r < startRow + MiniSquare; r++)
+                    for (int row = startRow; row < startRow + MiniSquare; row++)
                     {
-                        for (int c = startCol; c < startCol + MiniSquare; c++)
+                        for (int col = startCol; col < startCol + MiniSquare; col++)
                         {
-                            if (board[r, c] == 0 && Globals.candidates[r, c].Contains(num))
+                            if (board[row, col] == 0 && Globals.candidates[row, col].Contains(num))
                             {
-                                keyValuePairs[num].Add((r, c));
+                                keyValuePairs[num].Add((row, col));
                             }
                         }
                     }
@@ -203,11 +203,11 @@ namespace Omega_Sudoku
                             // Restrict each of the two cells’ candidate sets to exactly that pair.
                             foreach (var pos in pair)
                             {
-                                int r = pos.Item1;
-                                int c = pos.Item2;
-                                if (!Globals.candidates[r, c].SetEquals(unionCandidates))
+                                int row = pos.Item1;
+                                int col = pos.Item2;
+                                if (!Globals.candidates[row, col].SetEquals(unionCandidates))
                                 {
-                                    Globals.candidates[r, c] = new HashSet<int>(unionCandidates);
+                                    Globals.candidates[row, col] = new HashSet<int>(unionCandidates);
                                     result = Result.Changed;
                                 }
 

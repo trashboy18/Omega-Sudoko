@@ -178,13 +178,13 @@ namespace Omega_Sudoku.Heuristics
                 int startCol = (box % MiniSquare) * MiniSquare;
                 // Build a dictionary mapping cell position (row, col) to candidate pair for empty cells in this box.
                 Dictionary<(int, int), HashSet<int>> cellPairs = new Dictionary<(int, int), HashSet<int>>();
-                for (int r = startRow; r < startRow + MiniSquare; r++)
+                for (int row = startRow; row < startRow + MiniSquare; row++)
                 {
-                    for (int c = startCol; c < startCol + MiniSquare; c++)
+                    for (int col = startCol; col < startCol + MiniSquare; col++)
                     {
-                        if (board[r, c] == 0 && Globals.candidates[r, c].Count == 2)
+                        if (board[row, col] == 0 && Globals.candidates[row, col].Count == 2)
                         {
-                            cellPairs[(r, c)] = new HashSet<int>(Globals.candidates[r, c]);
+                            cellPairs[(row, col)] = new HashSet<int>(Globals.candidates[row, col]);
                         }
                     }
                 }
@@ -215,23 +215,23 @@ namespace Omega_Sudoku.Heuristics
                         processedCells.AddRange(group);
                         HashSet<int> nakedPair = cellPairs[key];
                         // For every other empty cell in this box, remove the two candidates.
-                        for (int r = startRow; r < startRow + MiniSquare; r++)
+                        for (int row = startRow; row < startRow + MiniSquare; row++)
                         {
-                            for (int c = startCol; c < startCol + MiniSquare; c++)
+                            for (int col = startCol; col < startCol + MiniSquare; col++)
                             {
-                                if (board[r, c] != 0)
+                                if (board[row, col] != 0)
                                     continue;
-                                if (group.Contains((r, c)))
+                                if (group.Contains((row, col)))
                                     continue;
-                                int beforeCount = Globals.candidates[r, c].Count;
+                                int beforeCount = Globals.candidates[row, col].Count;
                                 foreach (int candidate in nakedPair)
                                 {
-                                    Globals.candidates[r, c].Remove(candidate);
+                                    Globals.candidates[row, col].Remove(candidate);
                                 }
-                                if (Globals.candidates[r, c].Count < beforeCount)
+                                if (Globals.candidates[row, col].Count < beforeCount)
                                 {
                                     overallResult = Result.Changed;
-                                    if (Globals.candidates[r, c].Count == 0)
+                                    if (Globals.candidates[row, col].Count == 0)
                                         return Result.Contradiction;
                                 }
                             }
