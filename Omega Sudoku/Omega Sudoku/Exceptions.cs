@@ -36,6 +36,7 @@ namespace Omega_Sudoku.Exceptions
         }
 
     }
+    //raised if the user's choice is Invalid
     public class InvalidUserChoice : SudokuException
     {
         public InvalidUserChoice(string message)
@@ -45,6 +46,7 @@ namespace Omega_Sudoku.Exceptions
             }
         }
     }
+    //raised if the initial board is illegal.
     public class InvalidBoard : SudokuException
     {
         public InvalidBoard(string message)

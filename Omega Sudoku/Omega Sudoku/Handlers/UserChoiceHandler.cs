@@ -29,7 +29,7 @@ namespace Omega_Sudoku
             else
             {
                 //invalid option.
-                throw new Exception("you need to choose a valid option. try again!");
+                throw new InvalidUserChoice("you need to choose a valid option. try again!");
             }
 
         }
