@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Omega_Sudoku.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,8 +34,8 @@ namespace Omega_Sudoku.Heuristics
                         int num = Globals.candidates[row, col].First();
                         if (LogicHelpers.IsSafe(row, col, num))
                         {
-                            LogicHelpers.PlaceNum(board, row, col, num);
-                            if (!LogicHelpers.ForwardCheck(board, row, col, num))
+                            ChangeBoardUtils.PlaceNum(board, row, col, num);
+                            if (!ChangeBoardUtils.ForwardCheck(board, row, col, num))
                             {
                                 // Forward check failed: undo changes.
                                 return Result.Contradiction;
