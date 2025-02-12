@@ -6,8 +6,14 @@ using System.Threading.Tasks;
 
 namespace Omega_Sudoku.UI
 {
+    /// <summary>
+    /// just console writelines.
+    /// </summary>
     internal class Menu
     {
+        /// <summary>
+        /// prints the options set
+        /// </summary>
         public static void ShowMenu()
         {
             
@@ -19,10 +25,13 @@ namespace Omega_Sudoku.UI
             Console.ResetColor();
 
         }
+        /// <summary>
+        /// prints the initial introduction text.
+        /// </summary>
         public static void ShowIntroduction()
         {
             Console.ForegroundColor = ConsoleColor.Magenta;
-            Console.WriteLine("ΩΩ Welcome to the ultimate sudoku omega! ΩΩ");
+            Console.WriteLine("ΩΩ Welcome to the ultimate omega sudoku! ΩΩ");
             Console.WriteLine("Here you can type in sudokus(through console/file)," +
                 "and get a fast solution!");
             Console.ResetColor();
