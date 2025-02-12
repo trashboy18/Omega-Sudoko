@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Omega_Sudoku.Handlers
 {
+    /// <summary>
+    /// handles what happens if the user chose file.
+    /// </summary>
     internal class FileChoiceHandler
     {
         public static void HandleFile()
@@ -26,16 +29,17 @@ namespace Omega_Sudoku.Handlers
                         "correctly, or ensure it is located inside bin/debug.");
             }
             
-            
+            //read the whole file
                 string puzzleString = File.ReadAllText(filePath).Trim();
                 Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("An appropriate output is now inside the input file.");
-
                 Console.ResetColor();
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
                 StringBuilder solvedBoard = BasicHelpers.SolveProcess(puzzleString).Item1;
                 sw.Stop();
+                Console.WriteLine("An appropriate output is now inside the input file.");
+
+                //print into file.
                 File.WriteAllText(filePath, solvedBoard.ToString());
                 Console.WriteLine($"Sudoku solved in {sw.ElapsedMilliseconds} ms");
 
@@ -48,6 +52,7 @@ namespace Omega_Sudoku.Handlers
                 Console.ForegroundColor = ConsoleColor.Red;
                 string output = "an error occured: " + se.Message;
                 Console.WriteLine(output);
+                //print into file
                 File.WriteAllText (filePath,output);  
                 Console.ResetColor();
 

@@ -9,23 +9,27 @@ using Omega_Sudoku.Exceptions;
 
 namespace Omega_Sudoku
 {
+    /// <summary>
+    /// handles the choice of the user
+    /// </summary>
     internal class UserChoiceHandler
     {
         public static void HandleChoice(string choice)
         {
             if(choice.Equals("1"))
             {
+                //through console.
                 ConsoleChoiceHandler.HandleConsole();
             }
             else if(choice.Equals("2"))
             {
+                //through file.
                 FileChoiceHandler.HandleFile();
             }
             else
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("you didn't choose a valid option. try again!");
-                Console.ResetColor();
+                //invalid option.
+                throw new Exception("you need to choose a valid option. try again!");
             }
 
         }

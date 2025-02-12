@@ -6,15 +6,20 @@ using System.IO;
 
 namespace Omega_Sudoku
 {
+    /// <summary>
+    /// responsible for getting the input from the user and solving the boards.
+    /// </summary>
     internal class Input
     {
         public static void Main(string[] args)
         {
+            //show introduction.
             Menu.ShowIntroduction();
             while (true)
             {
                 try
                 {
+                    //show menu.
                     Menu.ShowMenu();
                     string choice = Console.ReadLine();
                     BasicHelpers.CheckStringValidity(choice);
@@ -23,7 +28,7 @@ namespace Omega_Sudoku
                     {
                         break;
                     }
-
+                    //operate based on what the user chose
                     UserChoiceHandler.HandleChoice(choice);
                 }
                 

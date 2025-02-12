@@ -9,6 +9,9 @@ using System.Xml;
 
 namespace Omega_Sudoku
 {
+    /// <summary>
+    /// technical helpers.
+    /// </summary>
     internal class BasicHelpers
     {
 

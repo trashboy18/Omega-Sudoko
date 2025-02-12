@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Omega_Sudoku
 {
+    /// <summary>
+    /// helpers that include logic.
+    /// </summary>
     internal class LogicHelpers
     {
         public static int N;
