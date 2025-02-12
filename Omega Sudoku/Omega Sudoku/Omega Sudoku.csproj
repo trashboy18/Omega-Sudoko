@@ -130,6 +130,8 @@
     <Compile Include="Solve.cs" />
     <Compile Include="Handlers\UserChoiceHandler.cs" />
     <Compile Include="UI\Menu.cs" />
+    <Compile Include="Utils\ChangeBoardUtils.cs" />
+    <Compile Include="Utils\CloneBoardUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
