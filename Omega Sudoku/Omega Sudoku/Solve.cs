@@ -5,10 +5,15 @@ using static Omega_Sudoku.Helpers.Enum;
 
 namespace Omega_Sudoku
 {
+    /// <summary>
+    /// The main solver. here the heuristics are called, and everything else that 
+    /// relates to solving the board.
+    /// </summary>
     internal class Solve
     {
         public static bool SolveSudoku(int[,] board)
         {
+            //first, try heuristics.
             if (!HeuristicSolver.HeuristicSolving(board))
             {
                return false;
