@@ -6,10 +6,17 @@ using System.Threading.Tasks;
 using Omega_Sudoku.Exceptions;
 namespace Omega_Sudoku
 {
+    /// <summary>
+    /// responsible for converting stuff.
+    /// </summary>
     internal class Conversions
     {
         static int N;
         static int MiniSquare;
+        /// <summary>
+        /// deduce the length of the board
+        /// </summary>
+        
         public static int DeduceBoardSize(int length)
         {
             //check if length is a perfect square: length = N*N.
@@ -30,6 +37,9 @@ namespace Omega_Sudoku
 
             return N;
         }
+        /// <summary>
+        /// convert the input string to a board
+        /// </summary>
         public static int[,] StringToBoard(string input)
         {
             int length = input.Length;
@@ -37,9 +47,9 @@ namespace Omega_Sudoku
 
             int[,] board = new int[N, N];
             int index = 0;
-            for (int r = 0; r < N; r++)
+            for (int row = 0; row < N; row++)
             {
-                for (int c = 0; c < N; c++)
+                for (int col = 0; col < N; col++)
                 {
                     char ch = input[index++];
                     int val = ch - '0'; // offset from '0'
@@ -51,12 +61,15 @@ namespace Omega_Sudoku
                             $"Invalid character '{ch}' => ASCII offset {val}. Must be in [0..{N}].");
                     }
 
-                    board[r, c] = val;
+                    board[row, col] = val;
                 }
             }
             return board;
         }
 
+        /// <summary>
+        /// converts the board to a string.
+        /// </summary>
         public static string BoardToString(int[,] board)
         {
             int N = Globals.N;
@@ -69,11 +82,11 @@ namespace Omega_Sudoku
             string beginning = "Here is the solved board as a string:";
             sb.AppendLine(beginning);
 
-            for (int r = 0; r < N; r++)
+            for (int row = 0; row < N; row++)
             {
-                for (int c = 0; c < N; c++)
+                for (int col = 0; col < N; col++)
                 {
-                    int val = board[r, c];
+                    int val = board[row, col];
                     if (val < 0 || val > N)
                     {
                         throw new InvalidCellsAmountException ($"Cell value {val} out of [0..{N}] range.");
